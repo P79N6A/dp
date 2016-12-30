@@ -1,0 +1,136 @@
+
+
+package ot;
+
+//=============================================================================
+//gid related
+//=============================================================================
+
+message GetUserCrowdsRequest {
+    message GetUserCrowdsParameter
+    {
+        required string trace_id = 1;
+        optional int64  aid = 2;
+        optional int64 user_id = 3;
+        optional string key_name = 4;
+        optional string key_value = 5;
+        required uint64 offset = 6; 
+        required uint64 limit = 7;
+        repeated UserProfileValueItem context = 8;
+        optional uint32 timestamp = 9;
+        optional string access_key_id = 10;
+        optional string request_id = 11;
+    }
+    required GetUserCrowdsParameter parameter = 1;
+    optional string sign = 2;
+}
+
+message GetUserCrowdsResponse {
+    required uint32 result_code = 1 [default = 0];
+    optional string error_message = 2;
+    repeated uint64 crowd_ids = 3;
+    optional uint64 total_count = 4;
+}
+
+message GetUserRawTagsRequest {
+    message GetUserRawTagsRequestParameter
+    {
+        //业务方的trace_id
+        required string trace_id = 1;
+        // taobao user_id
+        optional int64 user_id = 2;
+        //xxx id
+        optional int64 aid = 3;
+        //比如acookie_id
+        optional string key_name = 4;
+        // 跟key_name对应的具体值
+        optional string key_value = 5;
+        // 请求发送的时间戳，UTC时间，单位是秒
+        required uint64 offset = 6; //分页起始位置
+        required uint64 limit = 7; //获取条数, 限制Tag里Option的个数, offset=0且limit=0将返回所有
+        required uint32 timestamp = 8;
+        // 请求串id，是一个长度不超过64的字符串，字符取值范围为[a-zA-Z0-9-]，表示本次请求的标识号
+        optional string request_id = 9;
+        // 业务方对应的签名id，比如:alimama_dmp
+        required string access_key_id = 10;
+        //扩展参数
+        repeated UserProfileValueItem context = 11;
+    }
+    required GetUserRawTagsRequestParameter parameter = 1;
+    required string sign = 2; //签名串
+}
+
+message GetUserRawTagsResponse {
+    // 请求返回码 0 代表成功， 非0 代表存在错误，具体详见文档说明
+    required uint32 result_code = 1 [default = 0]; 
+    // 请求错误信息，返回码非0时填充，说明错误类型与原因
+    optional string error_message = 2;
+    // 请求串id，服务器端不做修改原封不动返回
+    optional string request_id = 3;
+    // 返回的tag集合
+    repeated RawTag tag_list = 4;
+}
+
+message ProfileValueItem {
+    required int32 value_type = 1; // 0:bool, 1:int32, 2:int64, 3:double, 4:string, 5:repeated bool, 6:repeated int32, 7:repeated int64, 8:repeated double, 9:repeated string
+    optional uint64 updatetime = 2;
+    optional bool bool_value = 3;
+    optional int32 int32_value = 4;
+    optional int64 int64_value = 5;
+    optional double double_value = 6;
+    optional string string_value = 7;
+    
+    repeated bool bool_m_value = 8;
+    repeated int32 int32_m_value = 9;
+    repeated int64 int64_m_value = 10;
+    repeated double double_m_value = 11;
+    repeated string string_m_value = 12;
+}
+
+message UserProfileValueItem {
+    required string field_name = 1;
+    required ProfileValueItem value = 2;
+}
+
+//=============================================================================
+//org tag related
+//=============================================================================
+// 老的继续保留，防止CopyFrom不兼容，避免qp，controller重新上线
+message Tag {
+    // 标签ID对应的编码
+    required string id = 1;
+
+    // 标签ID对应的分数
+    optional int64 score = 2 [default = 0]; 
+};
+
+message OrgTag {
+    // 标签的类型
+    optional uint32 type = 1;
+
+    // 具体的标签ID
+    repeated Tag tag = 2;  
+};
+
+// 人群标签集合
+message Crowd {
+    // 人群标签
+    repeated OrgTag tags = 1;  
+};
+
+// 新的orgtag命名方式
+// GetUserRawTags
+message RawOption {
+    // 选项原始值
+    required string id = 1;
+    // 用户对于选项的分值
+    optional int64 score = 2 [default = 0]; 
+}
+
+message RawTag {
+    //标签的种类
+    optional uint32 type = 1;
+    // 标签的选项值，0个或者多个
+    repeated RawOption options = 2;  
+}
+

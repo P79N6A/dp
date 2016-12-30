@@ -1,0 +1,11 @@
+git checkout xxxx
+git add .
+git commit -m "testtool"
+git push origin xxxx
+git checkout master
+git pull
+git merge xxxx
+git push origin master
+git branch -d xxxx
+git checkout -b xxxx
+git push origin xxxx

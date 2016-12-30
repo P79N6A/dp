@@ -1,0 +1,289 @@
+package poseidon.ors;
+
+option cc_generic_services = true;
+option py_generic_services = true;
+option java_generic_services = true;
+
+// 广告位分级
+message SpotGradeItem {
+    optional uint32 adx_id = 1;
+    optional string pos_id = 2;
+    optional string app_name = 3;
+
+    optional uint32 grade = 4;
+    optional float quality = 5;
+}
+
+message SpotGradeModel {
+    repeated SpotGradeItem items = 1;
+}
+
+// 内容分级
+// keyword和title支持没有fchannel的统计
+message VideoContextGradeItem {
+    // 一级分类ID
+    optional string fchannel = 1;
+    // 视频ID
+    optional uint64 video_id = 2;
+    // 节目ID
+    optional uint64 show_id = 3;
+    // 专辑ID
+    optional uint32 list_id = 4;
+    // 上传者ID
+    optional uint32 owner_uid = 5;
+    // 二级分类ID
+    optional uint32 schannel = 6;
+    // 关键词
+    optional string keyword = 7;
+
+    // 特征质量度
+    required float quality = 8;
+
+    // title 按空格分片
+    optional string title_segment = 9;
+
+    // 渠道
+    optional uint32 source = 10;
+
+    // os
+    optional string os = 11;
+}
+
+message VideoContextFeedbackItem {
+    // 一级分类ID
+    optional string fchannel = 1;
+    // 视频ID
+    optional uint64 video_id = 2;
+    // 节目ID
+    optional uint64 show_id = 3;
+    // 专辑ID
+    optional uint32 list_id = 4;
+    // 上传者ID
+    optional uint32 owner_uid = 5;
+    // 二级分类ID
+    optional uint32 schannel = 6;
+    // 关键词
+    optional string keyword = 7;
+
+    // 广告位ID
+    optional string pos_id = 8;
+
+    // 推广计划ID
+    optional uint32 campaign_id = 9;
+
+    // 广告ID
+    optional uint32 ad_id = 10;
+
+    // CPA,注册0,输出扣费=cpa
+    required float cpa = 11;
+}
+
+message VideoContextGradeModel {
+    repeated VideoContextGradeItem items = 1;
+    repeated VideoContextFeedbackItem feedback_items = 2;
+}
+
+
+message StatRateItem {
+    optional uint32 source_id = 1;
+    optional uint32 os_id = 2;
+    optional string pos_id = 3;
+    optional uint32 view_type_id = 4;
+    optional uint32 advertiser_id = 5;
+    optional uint32 campaign_id = 6;
+    optional uint32 ad_id = 7;
+    optional uint32 creative_id = 8;
+
+    //历史层级加权值
+    optional float ctr = 9;
+    optional float cvr = 10;
+    optional float cpa = 11;
+
+    //当天直接计算值
+    optional uint32 impressions = 12;
+    optional float costs = 13;
+    optional uint32 clicks = 14;
+    optional uint32 binds = 15;
+    optional float cpm = 16;
+    optional float cpc = 17;
+}
+
+message StatRateModel {
+    repeated StatRateItem items = 1;
+}
+
+message BudgetPacingItem {
+    // 推广计划
+    optional uint32 campaign_id = 1;
+
+    // 防止超预算的控制概率值
+    optional float budget_exceeding_ratio = 2;
+    // 匀速投放的控制概率值
+    optional float budget_pacing_ratio = 3;
+
+    // 渠道ID
+    optional uint32 adx_id = 4;
+    // 竞价模式  正常出价=0 固定出价=1
+    optional uint32 bidding_mode = 5;
+    // 固定出价时的价格
+    optional float fixed_price = 6;
+
+    // 订单ID
+    optional string deal_id = 7;
+}
+
+// 预算平滑
+message BudgetPacingModel {
+    repeated BudgetPacingItem items = 1;
+}
+
+// 参数
+message AdxBaseParam {
+    optional uint32 adx_id = 1;
+    optional bool enable_frequency_smooth_flag = 2;
+    optional float frequency_smooth_factor = 3;
+    optional bool enable_budget_pacing_flag = 4;
+    optional bool enable_bidding_explore_flag = 5;
+    optional float bidding_explore_rate = 6;
+    optional float bidding_explore_price = 7;
+    optional UserGradeParam user_grade_param = 8;
+    optional ContextGradeParam context_grade_param = 9;
+    optional uint32 bidding_mode = 10;
+    optional bool enable_cvr_factor_flag = 11;
+    optional bool enable_cpa_promote_flag = 12;
+    optional float cpa_promote_factor = 13;
+    optional int32 max_rsp_topn_count = 14;
+    optional bool enable_pdb_simple_mode = 15;
+    optional bool enable_top_score_bidding_flag = 16;
+    optional float top_score_min_threshold = 17;
+    optional bool enable_long_tail_bidding_flag = 18;
+    optional uint32 candidate_min_ad_num = 19;
+    optional bool enable_budget_bidding_flag = 20;
+    optional bool enable_ctr_factor_flag = 21;
+    optional SeedUserParam seed_user_param = 22;
+    optional bool enable_random_bid_mode = 23;
+    repeated string bid_dev_ids = 24;
+    optional SeedUserParam pay_seed_user_param = 25;
+    optional SeedUserParam active_seed_user_param = 26;
+}
+
+message SeedUserParam {
+    optional bool enable_seed_user_promote_flag = 1;
+    // 种子用户加权的阈值
+    optional uint32 seed_user_threshold = 2;
+    optional float seed_user_base_promote_rate = 3;
+    optional float seed_user_promote_rate_factor = 4;
+}
+
+message UserGradeParam
+{
+    optional bool enable_user_grade_flag = 1;
+    // 用户分级的方案ID
+    optional uint32 user_grade_plan_id = 2;
+    // 用户分级的阈值
+    optional uint32 user_grade_threshold = 3;
+    // 用户分级的出价率因子
+    optional float user_grade_promote_rate_factor = 4;
+}
+
+message ContextGradeParam {
+    // 是否启用内容分级
+    optional bool enable_context_grade_flag = 1;
+    // 内容分级的阈值
+    optional float context_grade_threshold = 2;
+    // 内容分级的出价率因子
+    optional float context_grade_promote_rate_factor = 3;
+}
+
+message PosBaseParam {
+    optional uint32 adx_id = 1;
+    optional string pos_id = 2;
+    optional float bid_floor_price = 3;
+    optional ContextGradeParam context_grade_param = 4;
+}
+
+message BaseParamModel {
+    repeated AdxBaseParam adx_base_params = 1;
+    repeated PosBaseParam pos_base_params = 2;
+}
+
+// 出价建议
+message BiddingProposalItem {
+    // 逼近出价
+    message ApproachBidding {
+        // 出价
+        required float bid_price = 1;
+        // 成本
+        required float bid_cost = 2;
+        // 逼近竞争对手出价
+        required float approach_bid_price = 3;
+    }
+
+    optional uint32 adx_id = 1;
+    optional string pos_id = 2;
+    optional uint32 view_type = 3;
+    repeated ApproachBidding approach_biddings = 4;
+}
+
+message BiddingProposalModel {
+    repeated BiddingProposalItem items = 1;
+}
+
+
+message PayFactorItem {
+    optional uint32 campaign_id = 1;
+    optional uint32 ad_id = 2;
+    optional float pay_factor = 3;
+}
+
+message PayFactorModel {
+    repeated PayFactorItem items = 1;                
+}
+
+message LRModel {
+    message FeatureWeight {
+        optional uint64 fea_hash = 1;
+        optional float weight = 2;
+    }
+
+    message CrossFeature {
+        repeated string feas = 1; // 特征维度  如 pid/aid/gender/age
+    }
+
+    // 特征转化
+    message TransformFeaVal {
+        optional string raw_fea = 1; // 如pid hour
+        optional string raw_val = 2;
+        optional string trans_fea = 3; // 如group_pid, group_hour
+        optional string trans_val = 4;
+    }
+    message Meta
+    {
+        required uint32 model_id = 1; // 模型ID
+        repeated CrossFeature cross_feas = 2; // 使用的特征组合
+        optional float negative_down_sampling_rate = 3; // 负样本采样率
+        repeated TransformFeaVal transform_fea_vals = 4; // 特征转化
+    }
+
+    required Meta meta = 1; // meta数据
+    repeated FeatureWeight items = 2; // 特征权重
+}
+
+
+message AlgoModelData {
+    optional BaseParamModel base_param_model_data = 1;
+    optional StatRateModel stat_rate_model_data = 2;
+    optional BudgetPacingModel budget_pacing_model_data = 3;
+    optional BiddingProposalModel bidding_proposal_model_data = 4;
+    optional VideoContextGradeModel video_context_grade_model_data = 5;
+    optional SpotGradeModel spot_grade_model_data = 6;
+    optional LRModel lr_model_data = 7;
+    optional PayFactorModel pay_factor_model_data = 8;
+}
+
+
+
+
+
+
+

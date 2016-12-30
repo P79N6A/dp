@@ -1,0 +1,262 @@
+package toutiao_ssp.api;
+enum AdType {
+    TOUTIAO_FEED_LP_LARGE = 1; // 690 * 286
+    TOUTIAO_FEED_LP_SMALL = 2; // 228 * 150
+
+    TOUTIAO_FEED_APP_LARGE = 4; // 690 * 286
+    TOUTIAO_FEED_APP_SMALL = 3; // 228 * 228
+
+    TOUTIAO_DETAIL_LP_GRAPHIC = 5; // 100 * 100 已不支持
+    TOUTIAO_DETAIL_LP_BANNER = 6;  // 690 * 238
+
+    TUANZI_FEED_APP = 7; // 600 * 400
+    TOUTIAO_DETAIL_APP_BANNER = 9; // 428 * 238
+    TOUTIAO_DETAIL_LP_TEXT_IMAGE = 10; // 690 * 238
+    TOUTIAO_FEED_LP_GROUP = 11; //组图 228 * 150
+    TOUTIAO_VIDEO_PATCH = 12; // 视频贴片广告 720p以上。视频比例16:9 已不支持
+    NETWORK_SPLASH = 13; //开屏广告 1080x1920,1242x1863,1200x1600,1280x1530,1280x755
+
+    TOUTIAO_SPLASH = 14; //头条开屏广告
+};
+
+
+message Pmp {
+    message Deal {
+        required uint32 id = 1;    // 私有交易id， 由exchange分配
+        optional uint32 bid_floor = 2;  // 此次展示竞价底价 (如果是pmp以这里的底价为主)
+        repeated string wseat = 3;      // 允许参与交易的广告主白名单
+        repeated string wadomain = 4;   // 允许参与竞价的广告主域名列表
+        optional uint32 at = 5;         // 1 表示first price, 2 表示Second price, 3 忽略底价
+    }
+
+    optional uint32 private_auction = 1; // 1 表示私有交易， 0 表示公有交易
+    repeated Deal deals = 2;             // 交易列表
+}
+
+
+message AdSlot {
+    enum Position {
+        SPLASH = 1;
+        FEED = 2;
+        DETAIL = 4;
+    };
+
+    message Banner {
+        required uint32 width = 1;
+        required uint32 height = 2;
+        required Position pos = 3;
+        optional string sequence = 4;
+    };
+    required string id = 1;         // 广告位id
+    repeated Banner banner = 2;     // 广告位空间描述
+    repeated AdType ad_type = 3;    // 可接收的广告类型
+    optional uint32 bid_floor = 4;  // 单位为分
+    optional Pmp pmp = 5;
+    optional uint32 patch_video_length = 6;  //贴片广告允许的最长时间
+    optional string patch_video_title  = 7;  //贴片广告载体视频的title
+    optional uint64 channel_id = 8;          //feed流的频道
+    optional uint64 timestamp = 9;           //头条开屏广告的时间戳
+};
+
+message Publisher {
+    required string id = 1;
+    optional string name = 2;
+    optional string cat = 3;
+    optional string domain = 4;
+};
+
+message Content {
+    message Producer {
+        required string id = 1;
+        optional string name = 2;
+        optional string cat = 3;
+        optional string domain = 4;
+    };
+
+    required string id = 1;
+    optional string title = 2;
+    optional string series = 3;
+    optional string url = 4;
+    optional string keywords = 5;
+    optional string contentrating = 6;
+    optional string userrating = 7;
+    optional string context = 8;
+    optional Producer producer = 9;
+    optional string language = 10;
+};
+
+message App {
+    required string id = 1 [default='11'];
+    optional string name = 2;
+    optional string domain = 3;
+    optional string ver = 4;
+    optional string bundle = 5;
+    optional uint32 privacypolicy = 6;
+    optional uint32 paid = 7;
+    optional Publisher publisher = 8;
+    optional Content content = 9;
+    optional string keywords = 10;
+};
+
+message Geo {
+    optional double lat = 1;
+    optional double lon = 2;
+    optional string country = 3;
+    optional string region = 4;   // 谈判待定
+    optional string city = 5;
+    optional string type = 6;
+};
+
+message Device {
+    enum ConnectionType {
+        Honeycomb = 1;  // 3G网
+        WIFI = 2;
+        UNKNOWN = 3;
+        NT_2G = 4;      //2G网
+        NT_4G = 5;      //4G网
+    };
+    enum DeviceType {
+        PHONE = 1;
+        TABLET = 2;
+    };
+
+    required bool dnt = 1;              // 是否允许追踪  待定
+    required string ua = 2;             // 待定 浏览器
+    optional string ip = 3;             //
+    optional Geo geo = 4;
+    optional string device_id = 5;
+    optional string device_id_md5 = 6;
+    optional string carrier = 7;
+    optional string language = 8;
+    optional string make = 9;           // 制造商
+    optional string model = 10;         // 型号
+    optional string os = 11;            // ios or android
+    optional string osv = 12;
+    optional bool js = 13;              // js support
+    optional ConnectionType connection_type = 14;
+    optional DeviceType device_type = 15;
+    optional string android_id = 16;    //对于android手机传输android_id
+};
+
+message Data {
+    message Segment {
+        optional string id = 1;     // segment 编码id, 具体的映射表线下提供
+        optional string name = 2;   // 暂时为空
+        optional string value = 3;  // 暂时为空
+    };
+    required string id = 1;        // 数据分类id
+    optional string name = 2;      // 数据分类名字
+    repeated Segment segment = 3;
+};
+
+message User {
+    enum Gender {
+        MALE = 1;
+        FEMALE = 2;
+        UNKNOWN = 3;
+    };
+    required string id = 1;
+    optional string buyer_id = 2;
+    optional string yob = 3;        // 用户年龄
+    optional Gender gender = 4;     // 用户性别
+    optional string keywords = 5;   // 兴趣关键词(utf-8), 以逗号分隔
+    optional Geo geo = 6;           // 地理位置
+    repeated Data data = 7;         // 额外的用户信息
+};
+
+message BidRequest {
+    enum BidReqType {
+        ONLY_RETARGET = 1;
+        ONLY_DSP = 2;
+        RETARGET_AND_DSP = 3;
+    }
+    required string request_id = 1;
+    required string api_version = 2;  // 接口版本
+    repeated AdSlot adslots = 3;
+    required App app = 4;
+    required Device device = 5;
+    required User user = 6;
+    optional BidReqType bid_req_type = 7[default=ONLY_DSP];//请求广告模式
+};
+
+message MaterialMeta {
+    message ImageMeta {
+        optional string description = 1;  // 应用下载额外的描述
+        required uint32 width = 2;        // 大图小图的问题
+        optional uint32 height = 3;
+        required string url = 4;          // 图片的外链, 常用格式
+        repeated string urls = 5;         //组图的外链，三个url
+    };
+
+    message ExternalMeta {
+        required string url = 1;
+    };
+
+    message AndroidApp {
+        required string app_name = 1;
+        required string download_url = 2;
+        optional string open_url = 3;      // 安装之后打开应用的url
+        optional string package = 4;
+        optional string web_url = 5;
+    };
+
+    message IosApp {
+        required string app_name = 1;
+        required string download_url = 2;
+        optional string open_url = 3;
+        optional string appleid = 4;
+        optional string ipa_url = 5;      // 越狱链接
+    };
+
+    required AdType ad_type = 1;
+    required string nurl = 2;             // winnotice url
+    optional string title = 3;            // 除detail_banner之外必须
+    required string source = 4;           // 来源, 默认dsp名
+    optional ImageMeta image_banner = 5;
+    optional ExternalMeta external = 6;   // 对于落地页广告才有
+    optional AndroidApp android_app = 7;  // android应用下载才有
+    optional IosApp ios_app = 8;          // ios应用下载才有
+    repeated string show_url = 9;         // 展现监测
+    repeated string click_url = 10;       // 点击监测
+    optional bool is_inapp = 11;          // is_inapp=true以原生态打开
+    optional string ext = 12;             // 点击展示监测扩展字段
+    optional string lp_open_url = 13;     //落地页广告调起链接,落地页广告需要的时候才进行填写
+    repeated string video_play_start = 14; // 视频开始播放监测url
+    repeated string video_play_finish = 15; // 视频播放完成监测url
+    optional string source_avatar = 16;     //广告来源头像
+    optional uint64 start_timestamp = 17;        //头条开屏广告投放的生效时间
+    optional uint64 end_timestamp = 18;        //头条开屏广告投放的失效时间
+};
+
+message Bid {
+    enum BidAdType {
+        RETARGET_AD = 1;//重定向广告，Adx负责对广告做ranking，比如：京东直投类型
+        DSP_AD = 2;//DSP广告
+    }
+    required string id = 1;
+    required string adslot_id = 2;
+    required uint32 price = 3;           // 单位为分
+    required uint64 adid = 4;            // 创意id
+    required MaterialMeta creative = 5;  // 素材
+    optional string dealid = 6;          // 如果是pmp需返回dealid字段
+    optional string cid = 7;             // 扩展id, 必须由数字组成的字符串，长度小于39位，选填，如果此字段有效则使用cid而不是adid, 如果可以通过adid(uint64)表示的建议使用adid
+    optional BidAdType bid_ad_type = 8 [default=DSP_AD];
+    optional double quality = 9;         // 京东直投用quality
+};
+
+message SeatBid {
+    repeated Bid ads = 1;
+    optional string seat = 2;  // 广告来源dsp识别
+};
+
+message BidResponse {
+    required string request_id = 1;
+    repeated SeatBid seatbids = 2;
+    optional uint64 error_code = 3;  // 请求出错时的错误码，用于问题排查
+};
+
+message DspClickNotification {
+    optional uint64 dspid = 1;
+    optional string click_uuid = 2;   // 经落地页url宏替换传递
+    optional uint32 price = 3;        // 竞标二价，经落地页url宏替换传递
+}

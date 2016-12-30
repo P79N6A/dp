@@ -1,0 +1,40 @@
+package ef;
+
+//create by xxxx
+//date: 2016/05
+
+option cc_generic_services = true;
+option py_generic_services = true;
+option java_generic_services = true;
+
+enum ActionType {
+    ACT_DISPALY = 1;
+    ACT_CLICK = 2;
+    ACT_DOWNLOAD = 3;
+};
+
+message FeedInfo {
+	required string imp_id = 1;
+	optional string dsp_id = 2;
+	required string bid = 3;
+	optional string session_id = 4;
+	optional int32 traffic_source = 5;
+	optional string ref_session_id = 6;
+	optional string creative_id = 7;
+	optional string imei = 8;
+	optional string idfa = 9;
+	optional string mac = 10;
+	optional string aid = 11;
+	required string adgroup_id = 12;
+	required uint32 advertiser_id = 13;
+	required uint32 campaign_id = 14;
+	required int32 bid_price = 15;
+	required int32 cost_price = 16;
+	required string billing_type = 17;
+	required ActionType action_type = 18;
+	required int64 campaign_daily_budget = 19;
+	required uint32 smooth_type = 20;
+	required uint32 post_hours = 21;
+	optional string acookie = 22;
+	optional int32 org_price = 23;
+};

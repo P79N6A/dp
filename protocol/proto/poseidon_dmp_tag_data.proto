@@ -1,0 +1,24 @@
+package poseidon.dmp;
+
+
+message DmpUserData
+{
+  message TagData
+  {
+    required uint32 tag_no =1;
+    repeated uint32 values = 2 [packed=true];
+  };
+  repeated TagData tag_datas = 1;
+};
+
+message DmpDevicePriceDatas
+{
+  message DevicePriceData
+  {
+    optional bytes key = 1;
+    optional bytes brand = 2;
+    optional bytes model = 3;
+    optional bytes price = 5;
+  };
+  repeated DevicePriceData datas = 1;
+};

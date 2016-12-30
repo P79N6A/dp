@@ -1,0 +1,221 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <string>
+#include <vector>
+#include "third_party/hiredis/include/hiredis.h"
+#include "util/log.h"
+#include "bidding_exploration.h"
+
+using namespace std;
+
+#define INVENTORY_KEY_TIME_TAG_LEN 15 
+#define INVENTORY_KEY_PREFIX_LEN 7
+
+namespace poseidon
+{
+	namespace ors_offline
+	{
+		BiddingExploration::BiddingExploration(){}
+		BiddingExploration::~BiddingExploration(){}
+
+		int BiddingExploration::init(std::string redis_server_ip, int redis_server_port)
+		{
+			m_redis_server.ip = redis_server_ip;
+			m_redis_server.port = redis_server_port;
+			m_min_imps = 1000;
+			return 0;
+		}
+
+		int BiddingExploration::getAllInventoryIds(std::map<std::string, 
+				std::set<std::string> >& inventory_keys)
+		{
+			LOG_INFO("getAllInventoryId beginning.");
+			redisContext* c;
+			redisReply* reply;
+			struct timeval timeout = { 1, 500000 };
+			c = redisConnectWithTimeout(m_redis_server.ip.c_str(), m_redis_server.port, timeout);
+			if (c == NULL || c->err)
+			{
+				if (c)
+				{
+					LOG_ERROR("Connection error: %s. redis_server_ip=%s, redis_server_port=%d.", c->errstr, m_redis_server.ip.c_str(), m_redis_server.port);
+				}
+				else
+				{
+					LOG_ERROR("Connection error: can't allocate redis context. redis_server_ip=%s, redis_server_port=%d.", m_redis_server.ip.c_str(), m_redis_server.port);
+				}
+				return -1;
+			}
+			string list_keys_cmd("KEYS CD_PID_*_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]_1");
+			reply = (redisReply*)redisCommand(c, list_keys_cmd.c_str());
+			LOG_DEBUG("Execute redis command:%s.", list_keys_cmd.c_str());
+			if (reply->type == REDIS_REPLY_ARRAY)
+			{
+				for (size_t i = 0; i < reply->elements; i++)
+				{
+					int len = strlen(reply->element[i]->str);
+					if (len <= INVENTORY_KEY_TIME_TAG_LEN + INVENTORY_KEY_PREFIX_LEN)
+					{
+						LOG_ERROR("Invalid inventory key:%s", reply->element[i]->str);
+						continue;
+					}
+					
+					int inventory_id_len = len - INVENTORY_KEY_TIME_TAG_LEN - INVENTORY_KEY_PREFIX_LEN;
+					char* inventory_id = new char[inventory_id_len + 1];
+					strncpy(inventory_id, reply->element[i]->str + INVENTORY_KEY_PREFIX_LEN, inventory_id_len);
+					inventory_id[inventory_id_len] = '\0';
+					map<string, set<string> >::iterator it = inventory_keys.find(inventory_id);
+					if (it != inventory_keys.end())
+					{
+						it->second.insert(reply->element[i]->str);
+					}
+					else
+					{
+						set<string> inventory_keys_set;
+						inventory_keys_set.insert(reply->element[i]->str);
+						inventory_keys[inventory_id] = inventory_keys_set;
+					}
+					//inventory_id_vec.push_back(reply->element[i]->str);
+					LOG_DEBUG("Inventory id key %d:key=%s, inventory_id=%s.", i, reply->element[i]->str, inventory_id);
+					delete[] inventory_id;
+				}
+			}
+			freeReplyObject(reply);
+			redisFree(c);
+
+			LOG_INFO("getAllInventoryId ended successfully.");
+			return 0;
+		}
+
+		int BiddingExploration::getBidPriceCnt(const std::string& inventory_id, 
+				const std::set<string>& inventory_id_keys,
+				std::map<int, int>& price_cnt)
+		{
+			LOG_INFO("getBidPriceCnt beginning. inventory_id=%s.", inventory_id.c_str());
+			redisContext* c;
+			redisReply* reply;
+			struct timeval timeout = { 1, 500000 };
+			c = redisConnectWithTimeout(m_redis_server.ip.c_str(), m_redis_server.port, timeout);
+			
+			if (c == NULL || c->err)
+			{
+				if (c)
+				{
+					LOG_ERROR("Connection error: %s. redis_server_ip=%s, redis_server_port=%d.", c->errstr, m_redis_server.ip.c_str(), m_redis_server.port);
+				}
+				else
+				{
+					LOG_ERROR("Connection error: can't allocate redis context. redis_server_ip=%s, redis_server_port=%d.", m_redis_server.ip.c_str(), m_redis_server.port);
+				}
+				return -1;
+			}
+
+			for (set<string>::const_iterator it = inventory_id_keys.begin();
+					it != inventory_id_keys.end(); it++)
+			{
+				string list_key_cmd = "HKEYS " + *it;
+				int total_imps = 0;
+				reply = (redisReply*)redisCommand(c, list_key_cmd.c_str());
+				LOG_DEBUG("Execute redis command:%s", list_key_cmd.c_str());
+				if (reply->type == REDIS_REPLY_ARRAY)
+				{
+					for (size_t i = 0; i < reply->elements; i++)
+					{
+						string get_val_cmd = "HGET " + *it + " " + reply->element[i]->str;
+						redisReply* val = (redisReply*)redisCommand(c, get_val_cmd.c_str());
+						LOG_DEBUG("Execute redis command:%s", get_val_cmd.c_str());
+						if (NULL == val)
+						{
+							LOG_ERROR("Get redis data error, inventory_id=%s, price=%s.", inventory_id.c_str(), reply->element[i]->str);
+							freeReplyObject(val);
+							continue;
+						}
+						int price = atoi(reply->element[i]->str);
+						int imps = atoi(val->str);
+						if (price <= 0 || imps <= 0)
+						{
+							LOG_ERROR("Invalid price and impressions: price=%d, imps=%d, price_str=%s, imps_str=%s.", price, imps, reply->element[i]->str, val->str);
+							freeReplyObject(val);
+							continue;
+						}
+
+						// price = second_price + 1
+						// price -= 1;
+						total_imps += imps;
+						map<int, int>::iterator find_it = price_cnt.find(price);
+						if (find_it != price_cnt.end())
+						{
+							price_cnt[price] = find_it->second + imps;
+						}
+						else
+						{
+							price_cnt[price] = imps;
+						}
+						LOG_DEBUG("inventory_id=%s, price=%d, count=%d, acc_count=%d.", inventory_id.c_str(), price, imps, price_cnt[price]);
+						freeReplyObject(val);
+					}
+				}
+				freeReplyObject(reply);
+				if (total_imps >= m_min_imps)
+				{
+					break;
+				}
+			}
+
+			redisFree(c);
+
+			LOG_INFO("getBidPriceCnt ended successfully.");
+			return 0;
+		}
+
+		int BiddingExploration::getBidLandscape(const std::string& inventory_id,
+				const std::set<std::string>& inventory_id_keys,
+				std::map<float, int>& bid_landscape, 
+				std::map<float, float>& bid_cost,
+				std::map<int, int>& price_cnt)
+		{
+			LOG_INFO("getBidLandscape beginning.");
+			//std::map<int, int> price_cnt;
+			if (-1 == getBidPriceCnt(inventory_id, inventory_id_keys, price_cnt))
+			{
+				LOG_ERROR("Failed to get bid price count for inventory:%s", inventory_id.c_str());
+				return -1;
+			}
+			
+			long total_imps = 0;
+			for (std::map<int, int>::const_iterator it = price_cnt.begin(); it != price_cnt.end(); it++)
+			{
+				total_imps += it->second;
+			}
+
+			if (0 == total_imps)
+			{
+				LOG_ERROR("Total impressions is 0, inventory_id=%s", inventory_id.c_str());
+				return -1;
+			}
+			
+			long acc_imps = 0;
+			float last_bid_cost = 0.0f;
+			LOG_DEBUG("Bengin to handle inventory id:%s", inventory_id.c_str());
+			for (std::map<int, int>::const_iterator it = price_cnt.begin(); it != price_cnt.end(); it++)
+			{
+				int second_bidding_price = it->first; // - 1;
+				// calculate cost if bid with price
+				float cost = (float)(last_bid_cost * acc_imps + second_bidding_price * it->second) / (acc_imps + it->second);
+				last_bid_cost = cost;
+				bid_cost[second_bidding_price] = cost;
+
+				// calculate win_rate;
+				acc_imps += it->second;
+				float win_rate = (float)acc_imps / (float)total_imps;
+				bid_landscape[win_rate] = second_bidding_price;
+				LOG_DEBUG("Handle: price=%d, second_bidding_price=%d, count=%d, cost=%f, win_rate=%f.", it->first, second_bidding_price, it->second, cost, win_rate);
+			}
+			LOG_DEBUG("Ended handle inventory id:%s", inventory_id.c_str());
+
+			LOG_INFO("getBidLandscape ended successfully.");
+			return 0;
+		}
+	}// namespace ors_offline
+}// namespace poseidon

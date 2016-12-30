@@ -1,0 +1,23 @@
+package poseidon.model_updater;
+
+option cc_generic_services = true;
+option py_generic_services = true;
+option java_generic_services = true;
+
+
+message FileToMemkvConfig {
+    required string file_path = 1;
+    required int32 data_id = 2;
+}
+
+message ModelUpdaterConfig {
+    optional FileToMemkvConfig base_param_config = 1;
+    optional FileToMemkvConfig stat_rate_config = 2;
+    optional FileToMemkvConfig budget_pacing_config = 3;
+    optional FileToMemkvConfig spot_grade_config = 4;
+    repeated FileToMemkvConfig video_context_grade_configs = 5;
+    repeated FileToMemkvConfig lr_configs = 6;
+    optional FileToMemkvConfig scoring_param_config = 7;
+    optional FileToMemkvConfig bidding_proposal_config = 8;
+    optional FileToMemkvConfig pay_factor_config = 9;
+}

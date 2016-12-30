@@ -1,0 +1,40 @@
+package poseidon.ors;
+
+option cc_generic_services = true;
+option py_generic_services = true;
+option java_generic_services = true;
+
+
+message ShmConfig {
+    required uint32 shm_meta_key = 1;
+    repeated uint32 shm_table_keys = 2;
+    required uint32 shm_table_size = 3;
+}
+
+message FileToShmConfig {
+    required string file_path = 1;
+    required ShmConfig shm_config = 2;
+}
+
+message ShmToRedisConfig {
+    required uint32 shm_key = 1;
+    required uint32 shm_size = 2;
+    required string redis_host = 3;
+    required uint32 redis_port = 4;
+}
+
+// 算法模型数据配置
+message AlgoModelDataConfig {
+    required uint32 model_id = 1;
+    required FileToShmConfig file_to_shm_config = 2;
+}
+
+message AlgoModelConfig {
+    optional FileToShmConfig base_param_config = 1;
+    optional FileToShmConfig stat_rate_config = 2; 
+    optional FileToShmConfig budget_pacing_config = 3;
+    optional FileToShmConfig video_context_grade_config = 4;
+    optional FileToShmConfig spot_grade_config = 5;
+    repeated FileToShmConfig lr_config = 6;
+    optional ShmToRedisConfig  property_stat_config = 7;
+}

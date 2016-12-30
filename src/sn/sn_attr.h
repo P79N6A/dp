@@ -1,0 +1,22 @@
+/**
+ **/
+
+
+#ifndef  _SN_ATTR_H_ 
+#define  _SN_ATTR_H_
+
+#define ATTR_SN_REQ 107
+#define ATTR_SN_RSP 108
+#define ATTR_SN_LATENCY_LESS_5  109
+#define ATTR_SN_LATENCY_LESS_10 110
+#define ATTR_SN_LATENCY_LESS_20 111
+#define ATTR_SN_LATENCY_GT_20   112
+#define ATTR_SN_UPDATE_INDEX    2154
+#define ATTR_REQ_PARSE_ERR  2218
+#define ATTR_SN_RETURN_ZERO 2219
+#define ATTR_SN_RETURN_NOT_ZERO 2220
+#define ATTR_SN_RETURN_MAX  2221
+#define ATTR_MD5_ERROR  2222
+#define ATTR_UPDATE_ERROR   2223
+
+#endif   // ----- #ifndef _SN_ATTR_H_  ----- 

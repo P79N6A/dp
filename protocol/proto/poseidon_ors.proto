@@ -1,0 +1,194 @@
+import "poseidon_rtb.proto";
+import "poseidon_dmp.proto";
+import "poseidon_common.proto";
+import "poseidon_util.proto";
+
+package poseidon.ors;
+
+option cc_generic_services = true;
+option py_generic_services = true;
+option java_generic_services = true;
+
+//浏览者用户信息
+message UserInfo {
+    //acookie信息
+    optional string acookie = 1;
+    
+    //aid
+    optional string aid = 2;
+    
+    //dmp标签
+    repeated string dmp_tag = 3;
+
+    //for dsp模型标签. Not Used, Ors get org tag by itself.
+    repeated ot.OrgTag org_tag = 4;
+}
+
+//页面类目以及权重
+message PageCategory {
+    required int32 id = 1;
+    required int32 weight = 2;
+};
+    
+//流量信息
+//http://www.csdn.net/article/2015-01-06/2823434
+message TrafficInfo {
+    //顶级域名 csdn.net
+    optional string domain = 1;
+    
+    //站点名 www.csdn.net
+    optional string site = 2;
+    
+    //页面url http://www.csdn.net/article/2015-01-06/2823434
+    optional string url = 3;
+    
+    //refer url
+    optional string ref = 4;
+    
+    //source 0:js, 1: server2server, 2:tanx, 3:google, 4:bes, 5:sax, 6:tax
+    optional int32 traffic_source = 5;
+    
+    //site category
+    repeated int32 site_categories = 6;
+    
+    // 当前分区的内容分类
+    repeated string sectioncat = 7;
+    
+    repeated PageCategory page_category = 8; 
+
+    //app name
+    optional string app_name = 9;
+
+    //pid
+    optional string imp_id = 10;
+    
+    //ad location in page
+    optional int32 view_screen = 11;
+    
+    //width
+    optional uint32 width = 12;
+    
+    //height
+    optional uint32 height = 13;
+    
+    //keywords
+    repeated string keywords = 14;
+    
+    //view type
+    optional int32 view_type = 15;
+
+    //是否定价
+    optional bool is_fixed_price = 16;
+
+    //需要的广告个数
+    optional int32 ad_num = 17;
+
+    //最低竞价min_cpm_price
+    optional uint32 min_cpm_price = 18 [ default = 0 ];
+    
+    //多view_type支持
+    repeated int32 view_types = 19;
+}
+
+message AlgoAd {
+    //广告id，顺序编号
+    optional uint32 id = 1;
+    
+    //广告
+    optional poseidon.common.Ad ad = 2;
+
+    //创意
+    optional poseidon.common.Creative creative = 3;
+
+    // 所需关键词数量, 仅当文字链创意时该字段有效
+    optional uint32 keywords_num = 4;
+}
+
+//在线算法请求输入数据
+message AlgoRequest {
+    //dspid
+    required string dspid = 1;
+    
+    //bidid used for algo-log join
+    required string bidid = 2;
+    
+    //traffic information
+    optional TrafficInfo traffic_info = 3;
+    
+    //user information
+    optional UserInfo user_info = 4;
+    
+    //device information
+    optional poseidon.rtb.Device device_info = 5;
+
+    //advertise information
+    repeated AlgoAd algo_ads = 6;
+    
+    //video information
+    optional poseidon.rtb.Video video = 7;
+
+    //pv targetting
+    repeated poseidon.common.Targetting targets = 8;
+
+    optional bytes session_id = 9;
+    
+    repeated poseidon.common.FeedbackInfo feedbacks = 10;
+    
+    optional poseidon.rtb.App app_info = 11;
+    
+    optional string trace_id = 12;
+
+    repeated poseidon.common.ExpParam exp_param = 13;
+
+    optional poseidon.common.ScoringToOrsMsg scoring_to_ors_msg = 14;
+
+    //用户-source曝光的频次
+    optional int32 user_source_freq=15;
+
+    //用户-source点击的频次
+    optional int32 user_source_click_freq = 16;
+}
+
+//Rank后的广告
+message AlgoedAd {
+    //广告id，顺序编号
+    optional uint32 id = 1;
+    
+    //算法报价
+    optional uint32 algo_price = 2;
+
+    // 关键字集合, 适用于文字链广告
+    repeated string keywords = 3;
+
+    //跟广告主结算报价
+    optional uint32 cost_price = 4;
+
+    // 竞价流量标记 0:正常竞价 1:出价探测
+    optional uint32 traffic_bid_flag = 5;
+
+}
+
+//在线算法处理后返回的广告
+message AlgoResponse {
+    //返回结果状态码
+    required poseidon.common.ErrorCode error_code = 1;
+
+    //处理机器名称
+    optional bytes hostname = 2;
+
+    //rank返回的广告
+    repeated AlgoedAd algoed_ads = 3;
+
+    // 通过pv中IP信息获取到的省份/城市信息
+    optional string province = 4;
+    optional string city = 5;
+
+    optional bytes session_id = 6;
+
+    repeated poseidon.util.KeyValue algo_feedbacks = 7;
+    repeated poseidon.util.KeyValue algo_pvlogs = 8;
+    
+    optional string trace_id = 9;
+
+}
+

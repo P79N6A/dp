@@ -1,0 +1,47 @@
+import "poseidon_common.proto";
+import "poseidon_util.proto";
+import "poseidon_rtb.proto";
+import "poseidon_sn.proto";
+package poseidon.scoring;
+
+
+message ScoringRequest {
+    // 页面广告位信息
+    repeated poseidon.sn.AdzInfo adz_info = 1;
+
+    // 流量上下文信息
+    optional poseidon.sn.TimeInfo time_info = 2;
+
+    // 地域信息
+    optional poseidon.common.Geo geo = 3;
+
+    // session id for merging log.
+    optional bytes session_id = 4;
+
+    // 流量来源
+    optional int32 traffic_source = 5;
+    optional string trace_id = 6;
+
+    //广告
+    repeated poseidon.common.Ad ad = 7;
+
+    //实验系统
+    repeated poseidon.common.ExpParam exp_param = 8;
+
+    //流量来源app信息
+    optional poseidon.rtb.App app_info = 9;
+
+    //设备信息
+    optional poseidon.rtb.Device device_info = 10;
+}
+
+
+message ScoringResponse {
+    //广告相关
+    repeated poseidon.common.Ad ad = 1;
+    // 落地pv日志 user_seed/user_grade/context_quality
+    repeated poseidon.util.KeyValue scoring_pvlogs = 2;
+    //传递给ors的信息
+    optional poseidon.common.ScoringToOrsMsg scoring_to_ors_msg = 3;
+}
+

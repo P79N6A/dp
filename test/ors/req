@@ -1,0 +1,106 @@
+dspid: "115509110"
+bidid: "92607"
+traffic_info {
+  traffic_source: 2
+  app_name: "com.penguin.nhvideos"
+  imp_id: "mm_26632353_8068780_27306791"
+  view_screen: 0
+  width: 240
+  height: 290
+  view_type: 102
+  ad_num: 2
+  min_cpm_price: 0
+}
+user_info {
+  aid: "80220590090788165"
+}
+device_info {
+  id: "D9EB37DA-B312-4181-8F9D-905246FF6D5E"
+  ip: "14.152.64.74"
+  user_agent: "Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_2 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13F69"
+  model: "iPhone8,2"
+  os: "android"
+  os_ver: "9.3.2"
+  connection_type: CONNECTION_TYPE_WIFI
+  brand: "Apple inc"
+  device_type: 2
+  ifa: "D9EB37DA-B312-4181-8F9D-905246FF6D5E"
+  ext {
+      dev_resolution: "1242x2208"
+      device_pixel_ratio: 3000
+    }
+}
+algo_ads {
+  id: 0
+  ad {
+      campaign_id: 2
+      freq_impression: -1
+      campaign_daily_budget: 1000000
+      send_speed: SST_FAST
+      billing_type: "3"
+      post_hours: 281474976710655
+      advertiser_id: 2107736
+      advertiser_budget: 201000
+      adgroup_id: 26
+      creative_id: 34
+      org_price: 150
+      algo_price: 0
+      score: 31
+      creative_format: 2
+      bid_type: 2
+      product: 2
+    }
+  creative {
+      creative_id: 34
+      content: "\350\212\222\346\236\234Android \346\217\222\345\261\217 \345\210\233\346\204\217"
+      dest_url: "http://assistant.xxxx.cn/client/down?type=1&ch=KD_485&urlType=1"
+      click_url: "http://assistant.xxxx.cn/client/down?type=1&ch=KD_485&urlType=1"
+      creative_category: 71301
+      creative_category: 71302
+      creative_category: 71303
+      creative_category: 71304
+      creative_category: 71305
+      creative_category: 71306
+      creative_category: 71307
+      creative_category: 71308
+      creative_category: 71309
+      creative_category: 71399
+      creative_format: 2
+      width: 240
+      height: 290
+      landing_mode: 2
+      landing_url_target: 1
+      subject_name: "\344\271\235\346\270\270\347\253\231\347\202\271"
+      subject_category_id: 3
+      app_os_platform: 0
+      download_type: 1
+      open_type: 1
+      img_url: "http://sh.image.xxxx.cn/s/y9k/g/2016/6/c349a397a914.jpg"
+      status: 3
+    }
+}
+targets {
+  type: 2002
+  value: "2"
+}
+targets {
+  type: 2004
+  value: "2"
+}
+targets {
+  type: 3001
+  value: "100201"
+}
+targets {
+  type: 3001
+  value: "100201"
+}
+targets {
+  type: 1007
+  value: "440100"
+}
+targets {
+  type: 5001
+  value: "102"
+}
+session_id: "6671"

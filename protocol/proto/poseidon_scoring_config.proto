@@ -1,0 +1,46 @@
+package poseidon.scoring;
+
+message ScoringConfig {
+	required bool debug_mode = 1; //配合dump_file参数使用，为true则不会进行任何操作，只是将输入的请求dump到文件里
+	optional string dump_file = 2;
+	optional bool disable_mode = 3; //用于测试其它模块的场景，为true则不进行实际的过滤和排序，只是简单地随便返回100个以下的广告
+}
+
+message AdxParams {
+    //对应渠道
+	required int32 source = 1;
+	//指定去除广告
+	repeated uint32 exclude_ad = 2;
+	//指定保留广告
+	repeated uint32 include_ad = 3;
+	//返回广告数目
+	optional int32 response_ad_num = 4 [default = 100];
+	optional bool disable_context_grade_filter = 5;
+	optional bool disable_user_grade_filter = 6;
+	optional float context_grade_threshold = 7 [default = 0];
+	optional int32 user_grade_threshold = 8 [default = 109];
+	optional int32 user_grade_plan_id = 9;
+	optional int32 seed_user_threshold = 10;
+	//随机排序
+	optional bool enable_random_choose_ad = 11 [default = false];
+}
+
+message PosParams {
+	required string pid = 1;
+	required int32 source = 2;
+	repeated uint32 exclude_ad = 3;
+	repeated uint32 include_ad = 4;
+	optional int32 response_ad_num = 5;
+	optional bool disable_context_grade_filter = 6;
+	optional bool disable_user_grade_filter = 7;
+	optional float context_grade_threshold = 8;
+	optional int32 user_grade_threshold = 9;
+	optional int32 user_grade_plan_id = 10;
+	optional int32 seed_user_threshold = 11;
+	optional bool enable_random_choose_ad = 12 [default = false];
+}
+
+message ScoringParams {
+	repeated AdxParams adx_params = 1;
+	repeated PosParams pos_params = 2;
+}

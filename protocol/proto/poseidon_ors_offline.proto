@@ -1,0 +1,150 @@
+package poseidon.ors_offline;
+
+option cc_generic_services = true;
+option py_generic_services = true;
+option java_generic_services = true;
+message Log4Config {
+    required string config_file = 1;
+    required string category = 2;
+}
+
+message BudgetPacingModelParams {
+    message AdxBiddingMode {
+        required uint32 adx_id = 1;
+        // 竞价模式  正常出价=0 固定出价=1
+        required int32 bidding_mode = 2;
+        optional float fixed_price = 3;
+        optional float bidding_rate = 4;
+    }
+
+    message CampaignBiddingMode {
+        required uint32 campaign_id = 1;
+        // 竞价模式  正常出价=0 固定出价=1
+        required int32 bidding_mode = 2;
+        optional float fixed_price = 3;
+        optional float bidding_rate = 4;
+    }
+
+    required float init_pacing_rate = 1;
+    required float pacing_change_rate = 2;
+    // seconds
+    required int32 pacing_update_cycle_time = 3;
+    // 0-no, 1-yes.
+    required int32 dynamic_pacing_change_rate = 4;
+    // 0-no, 1-yes.
+    required int32 resume_from_break_point = 5;
+    // 竞价模式  正常出价=0 1分钱出价=1
+    repeated AdxBiddingMode adx_bidding_mode = 6;
+    repeated CampaignBiddingMode campaign_bidding_mode = 7;
+    // 依据QPS进行竞价率调整的最大幅度
+    required float max_qps_adjust_rate = 8;
+}
+
+message BudgetPacingPdbModelParams {
+    required double alpha_coefficient = 1;
+    required double alpha_min_value = 2;
+    required double alpha_max_value = 3;
+    required float pacing_change_rate = 4;
+    // 0-no, 1-yes.
+    required int32 dynamic_pacing_change_rate = 5;
+    // 0-no, 1-yes.
+    // ignore attributes below
+    required int32 resume_from_break_point = 6;
+    required float init_pacing_rate = 7;
+    // seconds
+    required int32 pacing_update_cycle_time = 8;
+}
+
+message BudgetPacingFileManager {
+    required string ads_index_info_file = 1;
+    required string results_pb_file = 2;
+    required string results_tag_file = 3;
+    required string results_history_path = 4;
+    repeated string remote_dir = 5;
+    required string budget_hourly_percent_file = 6;
+}
+
+message PostedCampaignBudgetStatsServer {
+    required string host = 1;
+    required string port = 2;
+    required string path = 3;
+}
+
+message RedisServer {
+    required string ip = 1;
+    required int32 port = 2;
+}
+
+message PDBRedisServer {
+    required string ip = 1;
+    required int32 port = 2;
+}
+
+message BudgetPacingConfig {
+    required Log4Config log4config = 1;
+    required BudgetPacingModelParams model_params = 2;
+    required BudgetPacingPdbModelParams pdb_model_params = 3;
+    required BudgetPacingFileManager file_manager = 4;
+    required PostedCampaignBudgetStatsServer batch_campaign_server = 5;
+    required PostedCampaignBudgetStatsServer per_campaign_server = 6;
+    required RedisServer redis_server = 7;
+    required PDBRedisServer pdb_redis_server = 8;
+}
+
+message BiddingExplorationConfig {
+    message FileManager {
+        required string results_pb_file = 1;
+        required string results_tag_file = 2;
+        required string results_history_path = 3;
+        repeated string remote_dir = 4;
+    }
+
+    message ModelParams {
+        required int32 update_cycle_time = 1;
+    }
+
+    required RedisServer redis_server = 1;
+    required Log4Config log4config = 2;
+    required FileManager file_manager = 3;
+    required ModelParams model_params = 4;
+}
+
+message CXRStatsConfig {
+    message ModelParams {
+    // 模型更新周期
+        required int32 update_cycle_time = 1;
+        // 时间衰减因子
+        required float time_smoothing_factor = 2;
+        // CTR
+        required float ctr_default = 4;
+        required int32 ctr_bayes_factor = 5;
+        required uint32 sufficient_clicks = 7;
+        // CVR
+        required float cvr_default = 8;
+        required int32 cvr_bayes_factor = 9;
+        required uint32 sufficient_binds = 10;
+        // CPA
+        required float cpa_default = 11;
+        required int32 cpa_bayes_factor = 12;
+    }
+
+    required Log4Config log4config = 1;
+    required ModelParams model_params = 2;
+    repeated string alert_phone_number = 3;
+}
+
+message FtrlModelConfig {
+    message ModelParams {
+        required float alpha = 1;
+        required float beta = 2;
+        required float lambda1 = 3;
+        required float lambda2 = 4;
+        optional float feature_add_rate = 5 [default = 1.0];
+        optional int32 feature_add_count = 6 [default = 0];
+        required int32 mem_key = 7;
+        required int64 mem_size = 8;
+    }
+
+    required Log4Config log4config = 1;
+    required ModelParams model_params = 2;
+}

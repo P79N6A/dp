@@ -1,0 +1,75 @@
+adz_info {
+  id: "tt1"
+  width: 640
+  height: 200
+  ad_num: 1
+  targetting {
+    type: 1007
+    value: "320400"
+  }
+  targetting {
+    type: 2001
+    value: "3"
+  }
+  targetting {
+    type: 1001
+    value: "2"
+  }
+  targetting {
+    type: 2004
+    value: "1"
+  }
+  targetting {
+    type: 2002
+    value: "2"
+  }
+  view_type: 476
+  view_types: 476
+  view_types: 475
+  view_types: 477
+  video {
+    ext {
+      content {
+      }
+    }
+  }
+  min_cpm_price: 50
+}
+geo {
+  ip: "49.80.102.150"
+  latitude: 0
+  longtitude: 0
+}
+session_id: "3339"
+dsp_id: ""
+traffic_source: 7
+trace_id: "47e1020befbe7ea24d525551a88e767b"
+app_info {
+  id: "1"
+  name: "news_article"
+  version: "574"
+  publisher {
+  }
+  content {
+    producer {
+    }
+  }
+}
+device_info {
+  id: "868828029568412"
+  do_not_track: 1
+  ip: "49.80.102.150"
+  carrier: 0
+  user_agent: ""
+  make: "unknown"
+  model: "vivo Y35A"
+  os: "android"
+  os_ver: "5.0.2"
+  connection_type: CONNECTION_TYPE_WIFI
+  geo {
+    lat: 0
+    lon: 0
+    city: "\345\270\270\345\267\236"
+  }
+  device_type: 2
+}

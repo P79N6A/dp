@@ -1,0 +1,75 @@
+<script src="http://cdn.tanx.com/t/tanxmobile/mraid.js" type="text/javascript" charset="utf-8"></script>
+<style type="text/css" media="all">
+    .control-panel {
+        width: 400px;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+    }
+    iframe{
+        border:1px solid #ccc;
+    }
+</style>
+<script type="text/javascript">
+mraid.open = function(url) {
+    location.href = url
+}
+mraid.download = function(j) {
+    alert(JSON.stringify(j))
+}
+
+setTimeout(function() {
+    mraid.fireEvent('initDataReady', {
+    state: 'default',
+    size: {
+        width: 320,
+        height: 290
+    },
+    maxSize: {
+        width: 960,
+        height: 640
+    },
+    defaultPosition: {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0
+    },
+    supports: [
+        'level-1',
+        'level-2',
+        'level-3',
+        'screen',
+        'orientation',
+        'heading',
+        'location',
+        'shake',
+        'tilt',
+        'network',
+        'sms',
+        'phone',
+        'email',
+        'calendar',
+        'camera',
+        'audio',
+        'video',
+        'map'
+    ],
+    networkProtocol: '',
+    network: 'cell',
+    location: {
+        lat: 23,
+        lon: 33,
+        acc: 22
+    },
+    orientation: -1,
+    screenSize: {
+        width: 960,
+        height: 640
+    }
+})
+
+mraid.fireEvent('ready')
+
+}, 1000)
+</script>

@@ -1,0 +1,33 @@
+import "poseidon_common.proto";
+
+package poseidon.fc;
+
+
+//过滤请求消息
+message  FilterRequest
+{
+    //会话session
+    optional bytes session_id = 1;
+    //tanx用户ID
+    optional string aid = 2;
+    //dspID
+    optional string dspid = 3;
+    //用作广告展现的频次控制
+    optional string acookie = 4;
+
+    //广告相关
+    repeated poseidon.common.Ad ad =5;
+
+    //设备ID
+    optional string dev_id = 6;
+}
+
+
+//过滤模块控制返回消息
+message  FilterResponse
+{
+    //会话session
+    optional bytes session_id = 1;
+    //广告相关
+    repeated poseidon.common.Ad ad = 2;
+}

@@ -1,0 +1,23 @@
+import "poseidon_common.proto";
+
+package poseidon.sn.inverted_index;
+
+message ConjInfo{
+    repeated int64 tag = 1;             //该conj的标签列表
+    repeated poseidon.common.Ad ad = 2; //conj的Ad列表
+};
+
+
+message SizeTagValue
+{
+    optional int32 size = 1;        //size
+    optional int64 tag = 2;         //tag
+    repeated bytes conj_key = 3;    //conj_key list
+};
+
+message SizeTagList
+{
+    repeated int64 tag = 1;           //每个size对应的tag列表
+};
+
+

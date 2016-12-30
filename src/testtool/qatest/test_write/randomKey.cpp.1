@@ -1,0 +1,52 @@
+#include "data_api/kv_reg_mgr.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+int main(int argc, char *argv[])
+{
+    using namespace std;
+    using namespace poseidon::mem_sync;
+    //char bf[4096];
+    //char binary[17];
+    //srand((unsigned)time(0));
+    //printf("%s\n",std::itoa(rand(),binary,2));
+    /*srand((unsigned)time(0));
+    std::string s = std::to_string(rand());
+    char const  *ptmp = s.c_str(); 
+    char* pchar = const_cast<char*>(ptmp); 
+    fprintf(stdout, "random input is %s \r\n",pchar);*/
+    int r = 0, n = 20, data_id = 306;
+    string key;
+    string val;
+    KVRegMgr &mgr = KVRegMgr::get_mutable_instance();
+    mgr.init("localhost:2181", "100.84.73.56", 25600);
+
+    for (int i = 0; i < n; i++) {
+        sprintf(bf, "%d:kkkkkkkkkkkkkkk", i);
+        string temp(bf);
+	for(int j = 0; j < 3; j++){
+	    key.append(temp);	
+	}
+
+        sprintf(bf, "%d:vvvvvvvvvvvvvvvvvv", i);
+        string tempval(bf);
+	for(int k = 0; k < 1000; k++){
+	    val.append(tempval);	
+	}
+
+        mgr.put(key, val);
+    }
+
+    fprintf(stdout, "Press to reg_data\r\n");
+    getchar();
+    mgr.reg_data(data_id);
+
+    fprintf(stdout, "Press to exit\r\n");
+    getchar();
+
+    return r;
+    return 0;
+}
+
+ 

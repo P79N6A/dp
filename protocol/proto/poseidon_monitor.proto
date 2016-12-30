@@ -1,0 +1,21 @@
+package poseidon.monitor;
+
+
+message AttrInfo
+{
+    required int32 attr_id = 1; //上报属性ID
+    required int64 value = 2;   //上报属性值
+}
+
+//属性上报请求
+message ReportInfoReq
+{
+    optional int64 seq = 1;         //序号，每次+1
+    optional bytes hostname = 2;    //主机名
+    optional bytes hostip = 3 ;     //主机IP
+    optional int32 time_minute = 4; //上报的时间(分钟)
+    repeated AttrInfo attrs = 5;    //上报属性值
+};
+
+//这期暂时不做Ack
+

@@ -1,0 +1,66 @@
+1、安装protobuf库。把protobuf源代码复制到相应目录进行安装
+    .configure
+    make clean
+    make
+    sudo make install
+
+   若有使用tanx测试脚本，则需进入protobuf目录/python，执行：sudo python setup.py install
+   可能提示缺少compiler目录，这时进入python/google/protobuf目录新建一个compiler目录。
+
+   若执行sudo python setup.py install错误，经验：  
+   1、下载
+   wget https://pypi.python.org/packages/09/9c/4b038fbc54ef7ee3640c0f75f87c89f4bb4c7f20b31b8bfc1093e15ead9d/google-apputils-0.4.2.zip
+   然后解压进入目录，执行sudo python setup.py install
+   
+   2、下载
+   wget http://pkgs.fedoraproject.org/repo/pkgs/python-gflags/python-gflags-1.4.tar.gz/f51da2027557c7247276de3f66dac12a/python-gflags-1.4.tar.gz	
+   然后解压进入目录，执行sudo python setup.py install
+
+   最后回到protobuf/python目录，执行sudo python setup.py install即可。
+
+2、安装muduo库。分别进入base、net执行make;make install。
+3、安装mysql_c++库： 
+   sudo yum install mysql-devel.x86_64
+	
+   #指定boost的位置	
+   cmake ./ -DBOOST_ROOT:STRING=../boost
+   make clean;
+   make
+   若make有错误，则修改mysql相应的源文件即可.
+4、安装openssl：
+    make
+
+若启动程序提示"libmysqlclient.so.18: cannot open shared object file: No such file or directory"错误。则编辑.bashrc，加上:export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.，并把libmysqlclient.so.18拷贝到程序目录
+
+5、增加crontab脚本：
+  * * * * * /bin/bash /home/poseidon/poseidon/bin/monitor.sh >/dev/null 2>&1
+
+monitor.sh脚本内容：
+[xianghuizhang@~/work/Poseidon/src/adapter]$vi monitor.sh
+#!/bin/sh
+source /etc/profile
+source /home/xianghuizhang/.bashrc
+
+#切换到指定目录，这样后边run.sh才能顺利执行
+cd /home/xianghuizhang/work/Poseidon/src/adapter
+
+#增加monitor.sh命令的grpe忽略
+ps -fe|grep adapter|grep -v grep|grep -v monitor.sh
+if [ $? -ne 0 ]
+then
+echo "No process exists. Start process....."
+run.sh
+else
+echo "Runing....."
+fi
+~
+
+增加自启动脚本，修改/etc/rc.local文件：
+/bin/bash /home/poseidon/poseidon/bin/monitor.sh
+
+
+
+
+#####################muduo修改#########################
+LogStream.h,LogStream.cc：主要是把fixbuffer改为动态扩展的buffer
+Logging.cc:配合LogStream修改及改为本地时间。

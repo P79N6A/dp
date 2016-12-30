@@ -1,0 +1,1204 @@
+package poseidon.rtb;
+
+import "poseidon_util.proto";
+
+enum CreativeType {
+    CREATIVE_TYPE_TEXT_AD = 1;
+    CREATIVE_TYPE_BANNER_AD = 2;
+    CREATIVE_TYPE_JAVA_SCRIPT = 3;
+    CREATIVE_TYPE_IFRAME = 4;
+};
+
+enum ViewType
+{
+//两个维度：1是phone或pc  2是video(VIDEO_ADS)，Banner,...
+    VT_FIXED         = 1; //固定
+    VT_DOU_COUPLET   = 2; //双边对联
+    VT_POP_WINDOW    = 5; //弹窗
+    VT_POP_UNDER     = 7; //背投
+    VT_VIDEO_ROLL    = 11; //视频贴片   //VIDEO_ADS | LINEAR_VIDEO_AD
+    VT_VIDEO_PAUSE   = 12; //视频暂停   //VIDEO_ADS | NON_LINEAR_VIDEO_AD
+    VT_HOVER         = 13; //悬停
+    VT_SIN_COUPLET   = 14; // 单边对联
+    VT_WL_FULL       = 101; //无线开屏 //xxxx add >= 101就属于MOBILE_DEVICE | OUTER_FEEDBACK
+    VT_WL_POP_WINDOW = 102; //无线弹窗  //H5_TRAFFIC      |    OUTER_FEEDBACK | H5_TS xxxx add:插屏广告102
+    VT_WL_BANNER     = 103; //无线横幅  //H5_TRAFFIC      |   OUTER_FEEDBACK | H5_TS
+    VT_WL_WALL       = 104; //无线墙   //xxxx:NATIVE_TRAFFIC |  OUTER_FEEDBACK
+    VT_WL_TEXT       = 105; //无线文字链 //NATIVE_TRAFFIC   |  OUTER_FEEDBACK
+    VT_WL_VIDEO_ROLL = 106; //无线视频前贴片  //VIDEO_ADS | LINEAR_VIDEO_AD
+    VT_WL_VIDEO_MIDLINEAR = 170;//xxxx add:无线视频中贴
+    VT_WL_VIDEO_POSTLINEAR = 171;//xxxx add:无线视频后贴
+    VT_WL_VIDEO_FULLSCN = 172;//xxxx add:无线视频全屏 //VIDEO_ADS | NON_LINEAR_VIDEO_AD
+    VT_WL_VIDEO_PAUSE= 107; //无线视频暂停  //VIDEO_ADS  | NON_LINEAR_VIDEO_AD
+    VT_WL_FEEDS      = 108; //无线Feeds流 //NATIVE_TRAFFIC | OUTER_FEEDBACK
+    VT_WL_FOCUS      = 109; //无线焦点图  //NATIVE_TRAFFIC | OUTER_FEEDBACK
+    VT_WL_EMBED_WALL = 110; //无线内嵌墙  //NATIVE_TRAFFIC | OUTER_FEEDBACK
+    VT_WL_NATIVE     = 111; //无线Native  //NATIVE_TRAFFIC | OUTER_FEEDBACK
+    VT_WL_FIXED_WEB  = 201; //固定(移动网页) //WAP_TS
+    VT_WL_WEB_OVERLAY= 202; //浮窗(移动网页)  //
+    VT_WL_ADM        = 501; // 无线H5自有流量直投
+    VT_WL_MIX_APP    = 301;  //阿里游戏自有混合视频图片APP SDK    
+    //以下为优土专有
+    VT_YT_MOBILE_APP_PAUSE = 401;  //InAPP视频暂停
+    VT_YT_MOBILE_APP_FULL = 402;   //InAPP全屏
+    VT_YT_MOBILE_APP_LINEAR_0 = 403;  //InAPP前贴片
+    VT_YT_MOBILE_APP_LINEAR_1 = 404;  //InAPP中贴片
+    VT_YT_MOBILE_APP_LINEAR_2 = 405;  //InAPP后贴片
+    VT_YT_MOBILE_APP_PIC = 406;  //InAPP优酷移动播放页 图片广告
+    VT_YT_MOBILE_SITE_PIC = 407;  //移动WEB(M-W)优播页 图片广告
+    VT_YT_PC_SITE_YOUKU = 408;  //优酷PC页面播放页  图片广告
+    VT_YT_PC_SITE_TUDOU = 409;  //土豆PC页面播放页  图片广告
+    VT_YT_PC_SITE_PAUSE = 410;  //PC网页视频播放暂停广告
+    VT_YT_PC_SITE_JIAOBIAO= 411;  //PC网页视频角标
+    VT_YT_PC_SITE_LINEAR_0 = 412;  //PC网页视频前帖
+    VT_YT_PC_SITE_LINEAR_1 = 413;  //PC网页视频中帖
+    VT_YT_PC_SITE_LINEAR_2 = 414;   //PC网页视频后帖  
+    VT_YT_MOBILE_APP_NATIVE_100 = 415; //信息流100
+    //yunos  
+    VT_YUNOS_APP_AD = 350;//yun os推广位广告
+    //以下为爱奇异专有
+    VT_IQY_GEN_LINEAR_0 = 450; //前帖 不分PC/移动端
+    VT_IQY_GEN_LINEAR_1 = 451; //中贴 不分PC/移动端
+    VT_IQY_GEN_LINEAR_2 = 452; //后贴 不分PC/移动端
+    VT_IQY_PC_PAUSE = 453; //暂停PC
+    VT_IQY_MOBILE_PAUSE = 454; //暂停移动端/TV
+    VT_IQY_MOBILE_JIAOBIAO = 455; //移动端角标
+    VT_IQY_PC_JIAOBIAO = 456; //PC角标
+    VT_IQY_PC_OVERLAY = 457; //PC端通用Overlay    
+	//今日头条
+	VT_TT_FEED_LP_LARGE = 470; //头条信息流大图落地页，来源(限定10个字符),标题(25),落地页链接
+	VT_TT_FEED_LP_SMALL = 471; //头条信息流小图落地页，来源(10),标题(25),落地页链接
+	VT_TT_FEED_LP_GROUP = 472; //头条信息流组图落地页，来源(10),标题(25),落地页链接
+	VT_TT_FEED_DL_LARGE = 473; //头条信息流大图应用下载，应用名(6), 描述(25),下载链接
+	VT_TT_FEED_DL_SMALL = 474; //头条信息流小图应用下载，应用名(6), 描述(25),下载链接
+	VT_TT_FEED_DL_TUANZI = 478; //段子信息流应用下载，应用名(6),标题(30),下载链接
+	VT_TT_DETAIL_DL_BANNER = 475; //详情页 banner 应用下载，应用名(6),下载链接
+	VT_TT_DETAIL_LP_BANNER = 476; //详情页 banner 落地页，来源(10),素材,落地页链接
+	VT_TT_DETAIL_LP_TEXT_IMAGE = 477; //详情页大图文落地页，来源(10),标题(20),落地页链接
+	VT_TT_VIDEO_PATCH = 479; //头条视频前贴【此 type 的广告已停止投放】来源（10），标题（25），视频地址，落地页链接
+	VT_TT_SPLASH_LP = 480; //开屏广告静态图 标题（6-25），落地页链接
+	VT_TT_SPLASH_NETWORK_LP = 481; //开屏联播【投放到外部合作媒体】标题（25），落地页链接
+	//微博
+	VT_WAX_BANNER = 505; //BANNER
+	VT_WAX_FEED_NOR = 506;//普通Feed博文
+	VT_WAX_FEED_ACTIVITY = 507;//品牌大card
+	VT_WAX_FEED_VIDEO = 508;//品速视频	
+	VT_WAX_FEED_GRID = 509; //9宫格
+
+    //搜狐
+    VT_SOHU_VIDEO_LINEAR_0=550;    //sohu视频前贴
+    VT_SOHU_VIDEO_LINEAR_1=551;    //sohu视频中插
+    VT_SOHU_VIDEO_LINEAR_2=552;    //sohu视频后贴
+    VT_SOHU_VIDEO_PAUSE=553;       //sohu视频暂停
+    VT_SOHU_BANNER_OPEN_PIC=554;   //sohu视频开机图
+    VT_SOHU_BANNER_MIX=555;        //sohu图文混排
+    VT_SOHU_BANNER_HP=556;         //sohu 首页通栏
+    VT_SOHU_BANNER_HP_BRAND=557;   //sohu 首页品牌
+    VT_SOHU_BANNER_SELF=558;       //sohu 我的频道页&搜索页
+    
+};
+
+
+enum CreativeAttribute {
+    CREATIVE_ATTRIBUTE_AUDIO_AD_AUTO_PLAY = 1;
+    CREATIVE_ATTRIBUTE_AUDIO_AD_USER_INITIATED = 2;
+    CREATIVE_ATTRIBUTE_EXPANDABLE_AUTOMATIC = 3;
+    CREATIVE_ATTRIBUTE_EXPANDABLE_USER_INITIATED_CLICK = 4;
+    CREATIVE_ATTRIBUTE_EXPANDABLE_USER_INITIATED_ROLLOVER = 5;
+    CREATIVE_ATTRIBUTE_IN_BANNER_VIDEO_AD_AUTO_PLAY = 6;
+    CREATIVE_ATTRIBUTE_IN_BANNER_VIDEO_AD_USER_INITIATED = 7;
+    CREATIVE_ATTRIBUTE_POP = 8;
+    CREATIVE_ATTRIBUTE_PROVOCATIVE_OR_SUGGESTIVE_IMAGERY = 9;
+    CREATIVE_ATTRIBUTE_SHAKING_FLASHING_FLICKERING_SMILEYS = 10;
+    CREATIVE_ATTRIBUTE_SURVEYS = 11;
+    CREATIVE_ATTRIBUTE_TEXT_ONLY = 12;
+    CREATIVE_ATTRIBUTE_USER_INTERACTIVE = 13;
+    CREATIVE_ATTRIBUTE_WINDOWS_DIALOG_ALERT_STYLE = 14;
+    CREATIVE_ATTRIBUTE_HAS_AUDIO_ON_OF_BUTTON = 15;
+    CREATIVE_ATTRIBUTE_AD_CAN_BE_SKIPPED = 16;
+    CREATIVE_ATTRIBUTE_VPAID = 17;
+};
+enum VideoLinearity {
+	  VIDEO_LINEARITY_UNKNOW = 0;
+    VIDEO_LINEARITY_LINEAR = 1;
+    VIDEO_LINEARITY_NON_LINEAR = 2;
+    VIDEO_LINEARITY_PAUSE = 3;
+    VIDEO_LINEARITY_FULLSCREEN = 4;
+};
+enum VideoProtocol {
+    VIDEO_PROTOCOL_VAST_10 = 1;
+    VIDEO_PROTOCOL_VAST_20 = 2;
+    VIDEO_PROTOCOL_VAST_30 = 3;
+    VIDEO_PROTOCOL_VAST_WRAPPER = 4;
+    VIDEO_PROTOCOL_VPAID = 5;
+};
+enum VideoPlaybackMethod {
+    VIDEO_PLAYBACK_METHOD_AUTO_PLAY_WITH_SOUND_ALLOWED = 1;
+    VIDEO_PLAYBACK_METHOD_AUTO_PLAY_WITH_SOUND_NOT_ALLOWED = 2;
+    VIDEO_PLAYBACK_METHOD_CLICK_TO_PLAY = 3;
+    VIDEO_PLAYBACK_METHOD_MOUSE_OVER = 4;
+};
+enum VideoStartDelay {
+    VIDEO_START_DELAY_PRE_ROLL = 0;
+    VIDEO_START_DELAY_MID_ROLL = 1;
+    VIDEO_START_DELAY_POST_ROLL = 2;
+};
+enum ConnectionType {
+    CONNECTION_TYPE_UNKNOWN = 0;
+    CONNECTION_TYPE_ETHERNET = 1;
+    CONNECTION_TYPE_WIFI = 2;
+    CONNECTION_TYPE_CELLULAR_DATA = 3;
+    CONNECTION_TYPE_CELLULAR_DATA_2G = 4;
+    CONNECTION_TYPE_CELLULAR_DATA_3G = 5;
+    CONNECTION_TYPE_CELLULAR_DATA_4G = 6;
+};
+enum Gender {
+    GENDER_UNKNOWN = 0;
+    GENDER_MALE = 1;
+    GENDER_FEMALE = 2;
+};
+enum ExpandableDirection {
+    EXPANDABLE_DIRECTION_LEFT = 1;
+    EXPANDABLE_DIRECTION_RIGHT = 2;
+    EXPANDABLE_DIRECTION_UP = 3;
+    EXPANDABLE_DIRECTION_DOWN = 4;
+};
+enum ContentDeliveryMethod {
+    CONTENT_DELIVERY_METHOD_UNKNOWN = 0;
+    CONTENT_DELIVERY_METHOD_STREAMING = 1;
+    CONTENT_DELIVERY_METHOD_PROGRESSIVE = 2;
+};
+enum ContentContext {
+    CONTENT_CONTEXT_UNKNOWN = 0;
+    CONTENT_CONTEXT_TEXT = 1;
+    CONTENT_CONTEXT_VIDEO = 2;
+    CONTENT_CONTEXT_GAME = 3;
+    CONTENT_CONTEXT_INTERACTIVE = 4;
+};
+enum VideoQuality {
+    VIDEO_QUALITY_UNKNOWN = 0;
+    VIDEO_QUALITY_PROFESSIONALLY_PRODUCED = 1;
+    VIDEO_QUALITY_PROSUMER = 2;
+    VIDEO_QUALITY_USER_GENERATED = 3;
+};
+enum SourceRelationship {
+    SOURCE_RELATIONSHIP_INDIRECT = 0;
+    SOURCE_RELATIONSHIP_DIRECT = 1;
+};
+// 投放类型
+enum SendSpeedType {
+    // 尽快投放
+    SST_FAST = 1;
+    // 平滑投放
+    SST_SMOOTH = 2;
+};
+
+enum TrafficSource
+{
+    TS_TANX = 1;    //tanx
+    TS_YOUTU = 2;   //优土
+    TS_ALIGAME = 3; //9you
+    TS_CHANCE = 4; //畅思
+    TS_YUNOS = 5; //云OS
+    TS_IQIYI = 6; //爱奇异
+    TS_TOUTIAO = 7;//今日头条
+    TS_WAX = 8; //微博，粉丝通
+    TS_SOHU = 9;    //sohu
+};
+
+message Banner {
+
+    //adzoneid
+    required string id = 1;   
+
+    //广告位宽
+    optional int32 width = 2;
+
+    //广告位高
+    optional int32 height = 3;
+
+    //广告位屏数
+    // 广告位置
+    // 0 -- 未知
+    // 1 -- 网页靠上方位置
+    // 2 -- 废弃，可能或者不能直接可见（依赖屏幕大小和分辨率）
+    // 3 -- 网页靠下方位置
+    // 4 -- 头部(header)
+    // 5 -- 底部(footer)
+    // 6 -- 侧边栏(sidebar)
+    // 7 -- 全屏
+    optional int32 position = 4;
+
+    //屏蔽的创意类型
+    // 不支持的创意类型，如果为空，则允许所有类型
+    // 1 -- text
+    // 2 -- image
+    // 3 -- flash
+    // 4 -- video
+    repeated int32 blocked_creative_types = 5;
+
+    //屏蔽的创意属性
+    repeated CreativeAttribute blocked_creative_attributes = 6;
+
+    //允许的创意mime类型
+    repeated string formats = 7; // mime types
+
+    // 指定banner是否在top frame中还是在一个iframe中
+    // 0 : 并不在top frame中
+    // 1 : 在top frame中
+    optional int32 top_frame = 8; // default: false
+
+    // 对于可扩展的广告位，扩展方向
+    // 1 -- 左
+    // 2 -- 右
+    // 3 -- 上
+    // 4 -- 下
+    // 5 -- 全屏
+    repeated ExpandableDirection expandables = 9;
+
+    //iframe 阻止器
+    repeated string iframe_busters = 10;
+
+    // 支持的API frameworks
+    // 1 -- VPAID 1.0 
+    // 2 -- VPAID 2.0 
+    // 3 -- MRAID-1 
+    // 4 -- ORMMA 
+    // 5 -- MRAID-2
+    repeated int32 api = 14;
+
+};
+
+message Video {
+    // 支持的MIME类型 白名单
+    // 比如：“video/x-ms-wmv” for Windows Media, and “video/x-flv” for Flash Video.
+    repeated string formats = 1; // mime
+
+    // 是否允许广告是linear, non-linear或者均可
+    // "In-stream" or "linear" 指的是：为了看视频内容，强制用户必须观看的前贴/中贴/后贴广告
+    // “Overlay” or “non-linear” 指的是：在视频内容上展示的广告。 
+    // 如果该值未被设置，任何广告(linear or not) 都能在response中被允许返回
+    // 1 -- Linear/In-stream
+    // 2 -- Non-Linear/Overlay
+    optional VideoLinearity linearity = 2;
+
+    //
+    // video广告持续的最小时间(单位：毫秒)
+    optional int32 min_duration = 3;
+
+    // video广告持续的最大时间(单位：毫秒)
+    optional int32 max_duration = 4;
+
+    // 支持的响应协议
+    // 当支持多种协议时，请使用字段 protocols. 
+    // 强烈推荐保留该字段(即使在以后的某个版本里会被废弃)
+    // 至少要指定一个支持的协议，可在 “protocol” 或者 “protocols” 字段里指定
+    optional VideoProtocol protocol = 5;
+
+    // 广告位(or 播放器)宽
+    optional int32 width = 6;
+
+    // 广告位(or 播放器)高
+    optional int32 height = 7;
+
+    // 单位(秒)
+    // 如果值大于0，则是中贴，该值表示视频播放多少秒以后出广告
+    // 0 -- 前贴
+    // -1 - 中贴
+    // -2 - 后贴
+    optional VideoStartDelay start_delay = 8;
+
+    // 如果在一次竞价中有多个广告位请求，则该字段用来协调交付多个创意
+    optional int32 sequence = 9;
+
+    //屏蔽的创意属性
+    repeated CreativeAttribute blocked_creative_attributes = 10;
+
+    // extended video的最大时间
+    // 为空或者0表示不允许extended video
+    // -1 -- 允许且时间不限
+    // >0 -- 允许的最大秒数
+    optional int32 max_extended = 11;
+
+    // 最小的bit rate in Kbps
+    optional int32 min_bitrate = 12;
+
+    // 最大的bit rate in Kbps
+    optional int32 max_bitrate = 13;
+
+    // Pan&Scan：根据中心兴趣点裁剪画面 
+    // Letterboxing：保留画面完整性，上下留空隙带
+    // rules preventing letter boxing of 4x3 content to play in a 16x9 window, 
+    // then this should be set to false.
+    // 1 -- boxing is allowed
+    // 0 -- boxing is not allowed
+    optional int32 boxing_allowed = 14;
+
+    // 允许的回放方式
+    // 如果为空，则允许任何形式的回放
+    // 1 -- Auto-play sound on
+    // 2 -- Auto-play sound off
+    // 3 -- Click-to-play
+    // 4 -- Mouse-over
+    repeated VideoPlaybackMethod playback_methods = 15;
+
+    // 支持的delivery方法
+    // 如果为空，则允许任何形式
+    // 1 -- Streaming (流)
+    // 2 -- Progressive (渐进)
+    repeated ContentDeliveryMethod deliveries = 16;
+
+    // 广告位置
+    // 0 -- 未知
+    // 1 -- 网页靠上方位置
+    // 2 -- 废弃，可能或者不能直接可见（依赖屏幕大小和分辨率）
+    // 3 -- 网页靠下方位置
+    // 4 -- 头部(header)
+    // 5 -- 底部(footer)
+    // 6 -- 侧边栏(sidebar)
+    // 7 -- 全屏
+    optional int32 position = 17;
+
+    // 伴随广告
+    repeated Banner companion_ads = 18;
+
+    // 同banner的api字段
+    repeated int32 api = 19;
+
+    // 伴随广告的特性，只适用于Vast 2.0+
+    // 1 -- Static Resource
+    // 2 -- HTML Resource
+    // 3 -- iframe Resource
+    repeated int32 companion_type = 20;
+
+    // ext for tanx video
+    message Ext {
+        //广告位可能包含多个贴片，表示本贴片在上述集合中相对起始位置，单位毫秒
+        optional int32 section_start_delay = 1;
+        //创意类型黑名单(屏蔽的创意类型)
+        repeated int32 blocked_creative_types = 2;
+        //视频内容信息
+        optional Content content = 3;
+    };
+    optional Ext ext = 21;
+};
+
+// 适用于私有交换市场
+// private marketplaces
+message PMP
+{
+    // 是否只有deals才有资格参与的私有竞价
+    // 1 -- 仅局限于指定的deals
+    // 0 -- 不限
+    optional int32 private_auction = 1;
+
+    // 有资格直接交易的deal对象集合
+    // See Section 7.2
+    message Deal
+    {
+        required bytes id = 1;
+
+        // 最低竞标价格(CPM)
+        optional uint32 bidfloor = 2 [ default = 0 ];
+
+        // 如果bidfloor被指定并支持多种货币形式
+        // 应该使用ISO-4217货币代码指定该字段
+        // 有可能和bidder返回的货币代码不一致(如果平台支持)
+        // 人民币代码CNY, 美元USD
+        optional string bidfloorcur = 3;
+
+        // 允许的DSP的某些广告主
+        // Array of buyer seats allowed to bid on this Direct Deal. 
+        // Seats are an optional feature of an exchange. 
+        // For example, [“4”,”34”,”82”,”45”] indicates that 
+        // only advertisers using these exchange seats are allowed to bid on this direct deal.
+        repeated string wseat = 4;
+
+        // 允许的广告主域名
+        repeated string wadomain = 5;
+
+        // 竞拍类型 
+        // 1 -- first price auction.
+        // 2 -- second price auction.
+        // 3 -- the passed bidfloor indicates the apriori agreed upon deal price
+        optional int32 at = 6;
+
+    }
+    repeated Deal deals = 2;
+
+    //ext
+    message Ext {
+        //优先交易
+        message PreferredDeal {
+            required int64 dealid = 1;
+            // 允许的广告主白名单，不设置则默认所有均允许
+            repeated uint32 advertiser_ids = 2;
+            // 优先交易固定价格
+            optional uint32 fix_cpm_price = 3;
+        }
+        repeated PreferredDeal preferred_deals = 1;
+    }
+    optional Ext ext = 3;
+}
+
+message Impression {
+    //impression id标示
+    required string id = 1;
+
+    // 对于banner流量是必需的
+    // display，或者是 rich media，或者是嵌入视频的linear or non-linear视频广告的伴随banner
+    // The banner object may include a unique identifier; 
+    // this can be useful if these IDs can be leveraged in the VAST response 
+    // to dictate placement of the companion creatives 
+    // when multiple companion ad opportunities of the same size are available on a page.
+    optional Banner banner = 2;
+
+    // 对于(in-stream)video流量是必需的
+    optional Video video = 3;
+
+    // recommended for video and native apps
+    // ad mediation partner, SDK technology, or native player的名字
+    // 用来负责展现广告，适用于video或者mobile
+    // 这个用于广告服务器来适配广告代码
+    // Name of ad mediation partner, SDK technology, or native player 
+    // responsible for rendering ad (typically video or mobile). 
+    // Used by some ad servers to customize ad code by partner.
+    optional string display_manager = 4;
+
+    // displaymanager的版本信息
+    optional string display_manager_ver = 5;
+
+    // 1 -- 插播广告or全屏广告
+    // 0 -- 不是
+    optional int32 interstitial = 6;
+
+    // 特别的广告位置或者广告tag标记
+    // 适用于调试debug或者适用于buyer的优化
+    optional string tag_id = 7;
+
+    // 最低的CPM报价
+    optional uint32 bidfloor = 8 [ default = 0 ];
+
+    // 如果bidfloor被指定并支持多种货币形式
+    // 应该使用ISO-4217货币代码指定该字段
+    // 有可能和bidder返回的货币代码不一致(如果平台支持)
+    // 人民币代码CNY, 美元USD
+    optional string bidfloorcur = 9;
+
+    // Flag to indicate whether the impression requires 
+    // secure HTTPS URL creative assets and markup. 
+    // A value of “1” means that the impression requires secure assets. 
+    // A value of "0" means non-secure assets. 
+    // If this field is omitted the bidder should interpret the secure state 
+    // is unknown and assume HTTP is supported.
+    optional int32 secure = 10;
+
+    optional PMP pmp = 11;
+
+    // ext字段
+    message Ext
+    {
+        //展现类型，tanx系统专有
+        optional int32 view_type = 1;
+
+        //需要的广告个数
+        optional int32 ad_num = 2;
+
+        // 广告位所在页面的屏数
+        // 0 NA, 1 first, 2 second, 3 third, 4 forth, 5 fifth ... 
+        optional int32 view_screen = 3;
+
+        // 媒体禁止的目标跳转url
+        repeated string excluded_click_through_url = 4;
+        
+        // 媒体禁止的敏感类目
+        repeated int32 excluded_sensitive_category = 5;
+        
+        // 媒体禁止的广告行业类目
+        repeated int32 excluded_ad_category = 6;
+
+        // tanx所要求的创意等级(最小值)
+        optional int32 allowed_creative_level = 7;     
+        //xxxx 20160829add。若以上字段不满足某些请求协议需要，则把额外字段内容用json格式填在此字段中。
+        //yunos:{"categories":["1","2"], "pkgs":["1", "2"], "keyword":["1", "2"], "postype":"LIST"}
+        optional bytes special_json = 8;
+        //保存某些协议额外字段key-value值
+        repeated poseidon.util.KeyValue external_fields = 9;        
+        
+    };
+    optional Ext ext = 12;
+    //多view_type支持
+    repeated int32 view_types = 13;
+};
+
+message Publisher {
+    optional string id = 1;
+    optional string name = 2;
+    repeated int32 categories = 3; // 6.1
+    optional string domain = 4;
+};
+
+message Producer {
+    optional string id = 1;
+    optional string name = 2;
+    repeated int32 categories = 3; // 6.1
+    optional string domain = 4;
+};
+
+message Content {
+    //id
+    optional string id = 1;
+
+    // Content episode number(集数)
+    optional int32 episode = 2;
+
+    // Video examples: “Search Committee” (television) or “A New Hope” (movie) or “Endgame” (made for web)
+    // Non-video example: “Why an Antarctic Glacier Is Melting So Quickly” (Time magazine article)            
+    optional bytes title = 3;
+
+    // 内容系列
+    optional string series = 4;
+
+    // 季数
+    optional string season = 5;
+
+    // content的原始url
+    // for buy-side contextualization or review
+    optional string url = 6;
+
+    //本content的内容分类
+    repeated int32 categories = 7; // 6.1
+
+    // 视频质量
+    // 0 -- Unknown 
+    // 1 -- Professionally Produced (专业制作)
+    // 2 -- Prosumer (产消)
+    // 3 -- User Generated (UGC) (用户生成)
+    optional VideoQuality video_quality = 8;
+
+    // 关键词
+    repeated bytes keywords = 9;
+
+    // 内容分级
+    // 比如MPAA(美国电影协会)
+    optional string content_rating = 10;
+
+    // 用户分级
+    // e.g., number of stars, likes, etc.
+    optional string user_rating = 11;
+
+    // content的类型
+    // (game, video, text, etc.).
+    // 1 -- Video
+    // 2 -- Game
+    // 3 -- Music
+    // 4 -- Application
+    // 5 -- Text
+    // 6 -- Other
+    // 7 -- Unknown
+    optional ContentContext context = 12;
+
+    // 是否是直播
+    optional int32 live_stream = 13;
+
+    // 1 -- direct
+    // 0 -- indirect(引用?)
+    optional SourceRelationship source_relationship = 14;
+
+    // The producer is useful when content where the ad is shown is syndicated,
+    // and may appear on a completely different publisher
+    // This object is optional, but useful
+    // if the content producer is different from the site publisher.
+    optional Producer producer = 15;
+
+    // Length of content (appropriate for video or audio) in seconds.
+    optional int32 len = 16;
+
+    // 舆论媒体的分级
+    // 1 -- 所有人
+    // 2 -- 12岁以上
+    // 3 -- 成年人
+    optional int32 qag_media_rating = 17;
+
+    // 是否可嵌入
+    // 1 -- content can be embedded (such as an embeddable video player)
+    // 0 -- can not be
+    optional int32 embeddable = 18;
+
+    // Language of the content. Use alpha-2/ISO 639-1 codes.
+    optional string language = 19;
+
+    //10个自定义字段
+    message Ext {
+        message Direct {
+            required string key = 1;
+            required string value = 2;
+        };
+        repeated Direct direct = 1;
+    };
+    optional Ext ext = 20;
+};
+
+
+message Site {
+    //site id
+    optional string site_id = 1;
+
+    // site name, 可能被隐藏(由于publisher的要求)
+    optional bytes name = 2;
+
+    // 用于dsp的广告过滤
+    optional string domain = 3;
+
+    // 整个站点的内容分类
+    repeated int32 site_categories = 4;
+
+    // 当前页面的内容分类
+    repeated int32 page_categories = 5;
+
+    // 当前分区的内容分类
+    repeated string sectioncat = 6;
+
+    // 当前页面url
+    optional string page = 7;
+
+    // 站点是否有隐私政策
+    optional int32 privacypolicy = 8;
+
+    // ref url
+    optional string ref = 9;
+
+    // 搜索字符串
+    optional string search = 10;
+
+    //发布商
+    optional Publisher publisher = 11;
+
+    //site内容
+    optional Content content = 12;
+
+    //页面类目以及权重
+    message Ext {
+        message PageCategory {
+            required int32 id = 1;
+            required int32 weight = 2;
+        };
+        repeated PageCategory page_category = 1; 
+    };
+    optional Ext ext = 13;
+};
+
+
+message App {
+    //app id
+    optional string id = 1;
+
+    // app name, 可能被隐藏(由于publisher的要求)
+    optional bytes name = 2;
+
+    // 应用的domain
+    // 用于dsp的广告过滤
+    // 比如 "mygame.foo.com"
+    optional string domain = 3;
+
+    // 整个应用的内容分类
+    repeated int32 app_categories = 4;
+
+    // 当前分区的内容分类
+    repeated int32 section_categories = 5;
+
+    // 当前页面page/view的内容分类
+    repeated int32 page_categories = 6;
+
+    // 应用版本
+    optional string version = 7;
+
+    // 应用包名(Application bundle or package name)
+    // 比如: com.foo.mygame
+    optional string bundle = 8;
+
+    // app是否有隐私政策
+    optional int32 privacy_policy = 9;
+
+    // 是否付费版本
+    // 1 -- the application is a paid version
+    // 0 -- else (i.e., free).
+    optional int32 paid = 10;
+
+    //发布商
+    optional Publisher publisher = 11;
+
+    //内容
+    optional Content content = 12;
+
+    //是否全屏
+    optional int32 is_fullscreen = 13;
+
+    // 描述这个app的关键词
+    repeated string keywords = 14;
+
+    // app store URL
+    optional string storeurl = 15;
+    
+    // app ext信息
+    message Ext 
+    {
+        // app的广告位所允许的模板id列表(tanx native流量), 经过adapter映射之后
+        repeated int32 native_template_ids = 1;
+        // app广告位所允许的登陆类型
+        repeated int32 landing_types = 2;         
+        message NativeAdTemplate {
+	        required int32 native_template_id = 1;
+	        required int32 area_id = 2;
+	        required int32 w = 3;
+	        required int32 h = 4;
+        }
+        //native模板属性，多值
+        repeated NativeAdTemplate native_ad_template = 3;        
+        
+    };
+    optional Ext ext = 16;
+
+};
+
+
+message Geo {
+    // 纬度 (from -90 to 90) 南是负数
+    // 应该在精确知道的情况下才传递
+    optional float lat = 1;
+
+    // 经度 (from -180 to 180) 西是负数
+    // 应该在精确知道的情况下才传递
+    optional float lon = 2;
+
+    // 国家编码，使用ISO-3166-1 Alpha-3.
+    optional string country = 3;
+
+    // 地区编码，使用ISO 3166-2.
+    optional string region = 4;
+
+    // 地区编码，使用FIPS 10-4 notation (alternative to ISO 3166-2).
+    optional string region_fips_10_4 = 5;
+
+    // (see http://code.google.com/apis/adwords/docs/appendix/metrocodes.html).
+    // 区域城市编码
+    optional string metro = 6;
+
+    // City using United Nations Code for Trade and Transport Locations
+    // (http://www.unece.org/cefact/locode/service/location.htm).
+    optional string city = 7;
+
+    // 邮政编码
+    optional string postal_code = 8;
+
+    // 地理信息的来源类型
+    // 1 -- GPS/Location Services
+    // 2 -- IP Address
+    // 3 -- User provided (e.g., registration data)
+    // 当经纬度提供时，本字段需要提供
+    optional int32 type = 9;
+};
+
+message Device {
+    //设备id
+    optional string id = 1;
+
+    // 是否禁止跟踪 在浏览器中
+    // 0 -- 可以跟踪
+    // 1 -- 禁止跟踪
+    optional int32 do_not_track = 2;
+
+    // 特有平台id(platform-specific ID)
+    // 比如安卓ID 或者IOS的 UDID
+    // 不区分大小写
+    optional string dp_id = 3;
+
+    // IPv4
+    optional string ip = 4;
+
+    // 运营商或者网络提供商(ISP)
+    // 1 unknown, 2 中国移动, 3 中国联通, 4中国电信
+    optional int32 carrier = 5;
+
+    // 浏览器user agent
+    optional bytes user_agent = 6;
+
+    // 设备制造厂商
+    // 比如Apple
+    optional string make = 7;
+
+    // 设备型号
+    // 比如iPhone
+    optional bytes model = 8;
+
+    // 操作系统
+    // 比如 IOS
+    optional string os = 9;
+
+    // 操作系统版本
+    // 比如 3.1.2
+    optional bytes os_ver = 10;
+
+    // 设备是否支持javascript
+    // 1 -- 支持
+    // 0 -- 不支持
+    optional int32 js = 11;
+
+    // 设备所在网络类型
+    // 0 -- Unknown
+    // 1 -- Ethernet (以太网)
+    // 2 -- Wifi
+    // 3 -- Cellular data – Unknown Generation
+    // 4 -- Cellular data – 2G
+    // 5 -- Cellular data – 3G
+    // 6 -- Cellular data – 4G
+    optional ConnectionType connection_type = 12;
+
+    //品牌标识
+    optional bytes brand = 13;
+
+    // flash的版本
+    optional string flash_ver = 14;
+
+    //地理位置信息
+    optional Geo geo = 15;
+
+    // 设备类型
+    // 1 -- PC (个人电脑)
+    // 2 -- Mobile Phone
+    // 3 -- Tablet  (平板电脑)
+    // 4 -- TV
+    // 5 -- Connected Device (联网设备)
+    // 6 -- Set Top Box (机顶盒)
+    optional int32 device_type = 16;
+
+    // Native identifier for advertisers;
+    // an opaque ID assigned by the device or browser
+    // for use as an advertising identifier.
+    // (e.g. Apple's IFA, Android's Advertising ID, etc)
+    optional string ifa = 17;
+
+    message Ext {
+        optional string dev_resolution = 1;
+        // 设备像素比例
+        // 用于广告位size缩放，千分位表示，默认1000
+        optional int32 device_pixel_ratio = 2 [default=1000];
+    };
+    optional Ext ext = 18;
+
+};
+
+message Segment {
+    optional string id = 1;
+    optional string name = 2;
+    optional string value = 3;
+};
+message Data {
+    optional string id = 1;
+    optional string name = 2;
+    repeated Segment segments = 3;
+};
+
+message User {
+    //Unique consumer ID of this user on the exchange
+    optional string id = 1;
+
+    //Buyer’s user ID for this user as mapped by exchange for the buyer
+    optional string buyer_id = 2;
+
+    //出生年
+    optional int32 year_of_birth = 3;
+
+    //性别
+    optional Gender gender = 4;
+
+    //兴趣属性
+    repeated string keywords = 5;
+
+    //地理位置信息
+    optional Geo geo = 6;
+
+    //扩展字段
+    repeated Data data = 7;
+
+    message Ext {
+        //alimama cookie
+        optional string acookie = 1;
+
+        //alimama universe id
+        optional string aid = 2;
+
+        // taobao nick name
+        optional string nick_name = 3;
+    };
+    optional Ext ext = 8;
+};
+
+message BidRequest {
+    //bid
+    required string id = 1;
+
+    //版本号
+    required string version = 2;
+
+    //展现位信息
+    repeated Impression impressions = 3;
+
+    //站点信息
+    optional Site site = 4;
+
+    //应用信息
+    optional App app = 5;
+
+    //设备信息
+    optional Device device = 6;
+
+    //用户信息
+    optional User user = 7;
+
+    //私有交易类型
+    optional int32 auction_type = 8; // at
+
+    //最大时间
+    optional int32 max_time = 9; // tmax
+
+    //竞价席位信息
+    repeated string seats = 10; // wseats
+
+    // 是否确认全部展现
+    // Flag to indicate whether Exchange can verify that
+    // all impressions offered represent all of the impressions available
+    // in context (e.g., all impressions available on the web page;
+    // all impressions available for a video [pre, mid and postroll spots], etc.)
+    // to support road-blocking.
+    // A true value should only be passed if the exchange is aware of
+    // all impressions in context for the publisher.
+    // “0” means the exchange cannot verify, and “1” means that all impressions represent all impressions available.
+    optional int32 all_imps = 11;
+
+    message Ext {
+        // 流量来源
+        optional int32 traffic_source = 1;
+        // 时区
+        optional int32 timezone_offset = 2;
+        //页面pvid，tanx系统专有
+        optional string page_pv_id = 3;
+        // dsp id
+        optional string dsp_id = 4;
+
+        //xxxx add:特殊协议的json数据
+        //yunos:
+        //excluedPkgs中的内容会以数组的形式放在BidRequest::ext::request_json中，
+        //比如:{"excluedpkgs:["app.com", "com.yunos.taobao"]}。
+        optional bytes request_json = 5;
+    };
+    optional Ext ext = 12;
+
+    optional bytes session_id = 13;
+    
+    optional string trace_id = 14;
+};
+
+message Bid {
+    // ID for the bid object chosen by the bidder for tracking and debugging purposes
+    required string id = 1;
+
+    //impression id
+    required string impid = 2;
+
+    //Bid price in CPM , bidder出价
+    required int32 price = 3;
+
+    //ID that references the ad to be served if the bid wins
+    optional string ad_id = 4;
+
+    //展现反馈url, openrtb原生字段，不需要bidder提供
+    optional string notice_url = 5;
+
+    //广告标签
+    optional string ad_tag = 6;
+
+    //视频vast_xml信息
+    optional string adm = 7;
+
+    //广告主域名
+    optional string advertiser_domain = 8;
+
+    //图片素材信息
+    optional string image_url = 9;
+
+    //交易id
+    optional uint32 campaign_id = 10;
+
+    //创意id
+    optional string creative_id = 11;
+
+    //Deal ID
+    optional bytes deal_id = 12;
+
+    //创意素材width
+    optional int32 w = 13;
+
+    //创意素材height
+    optional int32 h = 14;
+
+    //创意属性
+    repeated CreativeAttribute creative_attributes = 15;
+
+    message Ext {
+        // 创意类目
+        repeated int32 category = 1;
+
+        // 创意品牌标识
+        optional uint32 brand_id = 2;
+
+        // 创意类型
+        optional uint32 creative_format = 3;
+
+        // 创意模板ID
+        optional string creative_template_id = 4;
+
+        // landing页面url
+        optional string dest_url = 5;
+
+        // 创意等级
+        optional int32 creative_level = 6;
+
+        // click url
+        optional string click_url = 7;
+
+        // 产品类型
+        optional int32 product_type = 8;
+
+        // 子产品类型
+        optional int32 sub_product_type = 9;
+
+        // adgroup id
+        optional string adgroup_id = 10;
+
+        // 广告主id
+        optional uint32 advertiser_id = 11;
+
+        // 结算类型,M,T,A...
+        optional string billing_type = 12;
+
+        // 广告的媒体结算价格
+        optional int32 settle_price = 13;
+
+        // 广告主结算价格
+        optional int32 cost_price = 14;
+
+        // 广告主原始报价
+        optional int32 org_price = 15;
+
+        // 广告定向数据
+        message MatchedTarget {
+            required string key = 1;
+            required string value = 2;
+        };
+        repeated MatchedTarget matched_target = 16;
+
+        //每日预算
+        optional int64 campaign_daily_budget = 17;
+
+        //投放策略
+        optional SendSpeedType send_speed = 18;
+
+        //计划投递时段, counter拿到这个字段要做预算的计算和平滑
+        optional uint32 post_hours = 19;
+
+        //广告主预算
+        optional uint32 advertiser_budget = 20;
+
+        //下载方式：1-Android应用内直接下载，2-Android应用内询问后下载，3-ios跳往appstore下载，4-ios应用内webview打开appstore详情页
+        optional uint32 download_type = 21;
+        
+        //打开方式：1-应用内webview打开，2-跳往浏览器打开
+        optional uint32 open_type = 22;
+        
+        //唤醒url（当填写该字段，优先唤醒本地app，如无法唤醒，则打开窗口或下载）
+        optional string deeplink_url = 23;
+        
+        //广告语
+        optional bytes ad_words = 24;
+    
+        //广告牌的标题
+        optional bytes title = 25;
+
+        //download URL
+        optional string download_url = 26;
+
+        //广告的频率控制   
+        optional int64 freq_impression = 27;
+
+    };
+    optional Ext ext = 16;
+
+    // 竞价流量标记 0:正常竞价 1:出价探测
+    optional uint32 traffic_bid_flag = 17;
+
+    //特定的数据，供特殊source-view_type使用    
+    //1、yunos的json返回格式：{"packagename":"tet", "signature":"s111", "md5":"ADsdfsafsa", "versioncode":11, "size" : 123432}    
+    //2、aligame自由协议返回格式：{"mixers\":[{"dest_url":"http://a.xxxx.cn/game/downs_7249.html","end_img_url":
+    //"http://sh.image.xxxx.cn","landing_mode":0,"templateid":1001,"video_url":"http://usdpdown.game.wwww.com"}]}"
+    optional bytes specific_data = 18;
+    
+    //素材ID
+    optional string material_id = 19;
+
+     //渠道
+    optional string ch = 20;
+
+    //内部广告主id
+    optional uint32 inner_advertiser_id = 21;
+
+    //gid
+    optional uint32 gid = 22;
+
+    //外部创意ID
+    optional bytes ext_cid = 23;
+
+    //溢价率，百分数，example:20表示溢价20%
+    optional int32 premium_rate=24;
+    
+    optional int32 view_type = 25;
+
+};
+
+message BidSeat {
+    //each bid object relates to an imp object in the bid request
+    repeated Bid bids = 1;
+
+    // ID of the bidder seat on whose behalf this bid is made
+    optional string seat = 2;
+
+    // “1” means impressions must be won-lost as a group; default is “0”
+    optional int32 group = 3;
+};
+
+message BidResponse {
+    required string id = 1;
+    repeated BidSeat bid_seats = 2;
+    // 0 -- SUCCESS
+    // 1 -- UNKNOWN
+    // 2 -- NOT_NEEDED
+    // 3 -- VIOLATED_FILTER
+    // 4 -- TECHNICAL_ERROR
+    optional int32 no_bid_reason = 3;
+    optional string bid_currency = 4;
+    message Ext {
+        // controller及后端模块的机器名称, 处理路径
+        optional string machine_path = 1;
+        // 透传ORS模块计算好省份/城市信息
+        optional string province = 2;
+        optional string city = 3;
+    };
+    optional Ext ext = 5;
+    optional bytes session_id = 6;
+    repeated poseidon.util.KeyValue algo_feedbacks = 7;
+    optional string trace_id = 8;
+
+    repeated int32 exp_id = 9;    //实验ID列表
+    optional string dev_id = 10;//回传的device_id
+
+};

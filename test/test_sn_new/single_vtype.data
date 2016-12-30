@@ -1,0 +1,22 @@
+adz_info {
+  id: "1000000000381"
+  width: 0
+  height: 0
+  ad_num: 1
+  targetting {
+    type: 2004
+    value: "1"
+  }
+  targetting {
+    type: 2002
+    value: "2"
+  }
+  view_type: 450
+}
+geo {
+  ip: "10.1.243.163"
+}
+session_id: "2699"
+dsp_id: "8888888"
+traffic_source: 6
+trace_id: "bc9b69069cf0bb64cc0ec996b93fbaa3"

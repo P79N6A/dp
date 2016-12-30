@@ -1,0 +1,19 @@
+package poseidon.myindex;
+
+
+message MiRequest
+{
+    repeated int64 targeting=1;
+    optional bytes sessionid=2;
+}
+
+message Ad
+{
+    optional bytes name=1;
+}
+
+message MiResponse
+{
+    repeated Ad ads=1;
+    optional bytes sessionid=2;
+}

@@ -1,0 +1,51 @@
+import "poseidon_common.proto";
+
+
+package poseidon.feedback;
+
+
+//过滤请求消息
+message  FeedbackRequest
+{
+    //会话session
+    optional bytes session_id = 1;
+
+    //tanx用户ID
+    optional string aid = 2;
+    //dspID
+    optional string dspid = 3;
+    //用作广告展现的频次控制
+    optional string acookie = 4;
+    //设备ID
+    optional string dev_id = 5;
+
+    //广告相关
+    repeated poseidon.common.Ad ad =6;
+    
+    optional string trace_id = 7;
+
+    optional int32 source=8;
+
+}
+
+
+//过滤模块控制返回消息
+message  FeedbackResponse
+{
+    //会话session
+    optional bytes session_id = 1;
+
+    required poseidon.common.ErrorCode error_code = 2;
+
+    //广告相关
+    repeated poseidon.common.FeedbackInfo feedbackinfo = 3;
+    
+    optional string trace_id = 4;
+
+    //用户-source曝光的频次
+    optional int32 user_source_freq = 5;
+
+    //用户-source点击的频次
+    optional int32 user_source_click_freq = 6;
+
+}

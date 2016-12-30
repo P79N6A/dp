@@ -1,0 +1,11 @@
+/*
+ **/
+
+#ifndef  _BP_ATTR_H_
+
+#define ATTR_BUDGETPACING_REDIS_ACCESS_ERROR  2246
+#define ATTR_BUDGETPACING_BIDDING_RATE_ERROR  2247
+#define ATTR_BUDGETPACING_BATCH_API_ERROR  2248
+
+#define  _BP_ATTR_H_
+#endif   // ----- #ifndef _SN_ATTR_H_  -----

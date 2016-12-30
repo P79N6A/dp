@@ -1,0 +1,22 @@
+/**
+ **/
+
+#ifndef _FB_ATTR_H_
+#define _FB_ATTR_H_
+
+#define ATTR_FB_REQ 2226
+#define ATTR_FB_PARSE_ERR 2227
+#define ATTR_FB_RSP 2228
+#define ATTR_GET_REDIS_ERR 2229
+#define ATTR_REDIS_ON_CONNECTED 2230
+#define ATTR_REDIS_ON_DISCONNECTED 2231
+#define ATTR_REDIS_ON_ERROR 2232
+#define ATTR_PACK_ERROR 2233
+#define ATTR_SEND_CMD_ERROR 2234
+#define ATTR_FB_LESS_5 2235
+#define ATTR_FB_LESS_10 2236
+#define ATTR_FB_LESS_15 2237
+#define ATTR_FB_LESS_20 2238
+#define ATTR_FB_LESS_50 2239
+
+#endif // ----- #ifndef _FB_ATTR_H_  -----

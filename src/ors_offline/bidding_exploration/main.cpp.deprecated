@@ -1,0 +1,260 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <map>
+#include "sys/stat.h"
+#include "sys/types.h"
+#include "../common/utility.h"
+#include "bidding_exploration.h"
+#include "protocol/src/poseidon_proto.h"
+#include "util/log.h"
+#include "util/proto_helper.h"
+
+using namespace std;
+using namespace poseidon::ors_offline;
+
+int loadConfig(const char* config_path,
+		poseidon::ors_offline::BiddingExplorationConfig& config)
+{
+	if (NULL == config_path)
+	{
+		fprintf(stderr, "Invalid config path.");
+		return -1;
+	}
+
+	if (!poseidon::util::ParseProtoFromTextFormatFile(config_path, &config))
+	{
+		fprintf(stderr, "Failed to parse budget pacing config.");
+		return -1;
+	}
+
+	return 0;
+}
+
+int pushData(const poseidon::ors_offline::BiddingExplorationConfig& config,
+		time_t t)
+{
+	string pb_file(config.file_manager().results_pb_file());
+	string pb_tag_file(config.file_manager().results_tag_file());
+	string tag_gen_command = "md5sum " + pb_file + " > " + pb_tag_file;
+	system(tag_gen_command.c_str());
+
+	for (int i = 0; i < config.file_manager().remote_dir_size(); i++)
+	{
+		string push_command = "scp -P 9922 " + pb_file + " " + pb_tag_file + " " + config.file_manager().remote_dir(i);
+		system(push_command.c_str());
+		LOG_INFO("Pushed file(%s and %s) to path(%s).", pb_file.c_str(), pb_tag_file.c_str(), config.file_manager().remote_dir(i).c_str());
+	}
+
+	if (!dir_exists(config.file_manager().results_history_path().c_str()))
+	{
+		LOG_ERROR("config.file_manager.results_history_path not exists:%s.", config.file_manager().results_history_path().c_str());
+		return -1;
+	}
+
+	string history_data_path(config.file_manager().results_history_path());
+	char day[9];
+	strftime(day, 9, "%Y%m%d", localtime(&t));
+	char hour[3];
+	strftime(hour, 3, "%H", localtime(&t));
+	char full_t[15];
+	strftime(full_t, 15, "%Y%m%d%H%M%S", localtime(&t));
+
+	history_data_path += string("/") + string(day);
+	if(!dir_exists(history_data_path.c_str()))
+	{
+		if (0 != mkdir(history_data_path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH))
+		{
+			LOG_ERROR("Create dir failed:%s.", history_data_path.c_str());
+			return -1;
+		}
+	}
+
+	history_data_path += string("/") + string(hour);
+	if(!dir_exists(history_data_path.c_str()))
+	{
+		if (0 != mkdir(history_data_path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH))
+		{
+			LOG_ERROR("Create dir failed:%s.", history_data_path.c_str());
+			return -1;
+		}
+	}
+
+	vector<string> pb_path_parts = split(pb_file, "/");
+	string his_pb_file = history_data_path + string("/") + string(full_t) + string("_") + pb_path_parts[pb_path_parts.size() - 1];
+	vector<string> pb_tag_path_parts = split(pb_tag_file, "/");
+	string his_pb_tag_file = history_data_path + string("/") + string(full_t) + string("_") + pb_tag_path_parts[pb_tag_path_parts.size() - 1];
+	string cp_pb_command = string("cp ") + pb_file + " " + his_pb_file;
+	string cp_pb_tag_command = "cp " + pb_tag_file + " " + his_pb_tag_file;
+	system(cp_pb_command.c_str());
+	LOG_INFO("Copy file from %s to %s.", pb_file.c_str(), his_pb_file.c_str());
+	system(cp_pb_tag_command.c_str());
+	LOG_INFO("Copy file from %s to %s.", pb_tag_file.c_str(), his_pb_tag_file.c_str());
+
+	return 0;
+}
+
+void addBidCostItem(poseidon::ors::BiddingProposalItem_BidCost* item, 
+		float bid_price, 
+		float cost)
+{
+	item->set_bid_price(bid_price);
+	item->set_cost(cost);
+}
+
+void addWinRatePriceItem(poseidon::ors::BiddingProposalItem_WinRatePrice* item, 
+		float win_rate, 
+		float bid_price)
+{
+	item->set_win_rate(win_rate);
+	item->set_bid_price(bid_price);
+}
+
+void addCostDistributionItem(poseidon::ors::BiddingProposalItem_CostDistribution* item,
+		int cost,
+		int cnt)
+{
+	item->set_cost(cost);
+	item->set_count(cnt);
+}
+
+void addBiddingItem(poseidon::ors::BiddingProposalItem* item, 
+		const string& inventory_id, 
+		const map<float, int>& bid_landscape,
+		const map<float, float>& bid_cost,
+		const map<int, int>& price_cnt)
+{
+	item->set_pos_id(inventory_id);
+	for (map<float, int>::const_iterator it = bid_landscape.begin();
+			it != bid_landscape.end(); it++)
+	{
+		addWinRatePriceItem(item->add_win_rate_prices(), it->first, (float)it->second);
+	}
+	for (map<float, float>::const_iterator it = bid_cost.begin();
+			it != bid_cost.end(); it++)
+	{
+		addBidCostItem(item->add_bid_costs(), it->first, it->second);
+	}
+	for (map<int, int>::const_iterator it = price_cnt.begin();
+			it != price_cnt.end(); it++)
+	{
+		addCostDistributionItem(item->add_cost_distributions(), it->first, it->second);
+	}
+}
+
+int saveBiddingProposalModel(const string& path,
+		const poseidon::ors::BiddingProposalModel& bidding_model)
+{
+	LOG_INFO("saveBiddingProposalModel beginning.");
+
+	fstream output(path.c_str(), ios::out | ios::trunc | ios::binary);
+	if (!output)
+	{
+		LOG_ERROR("Failed to open file:%s", path.c_str());
+		return -1;
+	}
+
+	if (!bidding_model.SerializeToOstream(&output))
+	{
+		LOG_ERROR("Failed write bidding proposal model to file:%s", path.c_str());
+		return -1;
+	}
+	output.close();
+
+	LOG_INFO("saveBiddingProposalModel end successfully.");
+	return 0;
+}
+
+int biddingExploreProcessor(const poseidon::ors_offline::BiddingExplorationConfig& config,
+	time_t t)
+{
+	BiddingExploration bidding_explore;
+
+	if (-1 == bidding_explore.init(config.redis_server().ip(), config.redis_server().port()))
+	{
+		LOG_ERROR("Failed to init bidding exploration.");
+		return -1;
+	}
+
+	map<string, set<string> > inventory_keys;
+	if (-1 == bidding_explore.getAllInventoryIds(inventory_keys))
+	{
+		LOG_ERROR("Failed to get all Inventory id keys.");
+		return -1;
+	}
+
+	poseidon::ors::BiddingProposalModel bidding_model;
+	for (map<string, set<string> >::const_iterator it = inventory_keys.begin();
+			it != inventory_keys.end(); it++)
+	{
+		map<float, int> bid_landscape;
+		map<float, float> bid_cost;
+		map<int, int> price_cnt;
+		if (-1 == bidding_explore.getBidLandscape(it->first, it->second, bid_landscape, bid_cost, price_cnt))
+		{
+			LOG_ERROR("Failed to get bid landscape for inventory id:%s.", it->first.c_str());
+			continue;
+		}
+		
+		addBiddingItem(bidding_model.add_items(), it->first,  bid_landscape, bid_cost, price_cnt);
+	}
+	
+	if (-1 == saveBiddingProposalModel(config.file_manager().results_pb_file(), bidding_model))
+	{
+		LOG_ERROR("save bidding proposal model error.");
+		return -1;
+	}
+
+	pushData(config, t);
+	return 0;
+}
+
+int main(int argc, char** argv)
+{
+	if (argc != 2)
+	{
+		fprintf(stderr, "Invalid parameters!\n");
+		fprintf(stderr, "Usage:%s [config path]\n", argv[0]);
+		fprintf(stderr, "Example:%s ./conf/bidding_exploration.conf\n", argv[0]);
+		return -1;
+	}
+
+	poseidon::ors_offline::BiddingExplorationConfig config;
+	if (-1 == loadConfig(argv[1], config))
+	{
+		fprintf(stderr, "Failed to parse bidding exploration config.");
+		return -1;
+	}
+
+	if (!LOG_INIT(config.log4config().config_file(), config.log4config().category()))
+	{
+		fprintf(stderr, "LOG_INIT error [%s, %s]", config.log4config().config_file().c_str(), config.log4config().category().c_str());
+		return -1;
+	}
+
+	while(true)
+	{
+		time_t start = time(0);
+		LOG_INFO("Bidding exploration processor start at %ld.", start);
+		if (-1 == biddingExploreProcessor(config, start))
+		{
+			LOG_ERROR("biddingExploreProcessor fail.");
+		}
+
+		time_t end = time(0);
+		LOG_INFO("Bidding exploration processor end at %ld.", end);
+		
+		time_t time_cost = end - start;
+		LOG_INFO("Bidding exploration processor takes %ld seconds", time_cost);
+
+		time_t time_sleep = config.model_params().update_cycle_time() - time_cost;
+		if (time_sleep > 0)
+		{
+			LOG_INFO("sleep %ld seconds.", time_sleep);
+			sleep(time_sleep);
+		}
+	}
+
+	return 0;
+}

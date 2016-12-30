@@ -1,0 +1,34 @@
+import "poseidon_common.proto";
+
+package poseidon.dn;
+
+option cc_generic_services = true;
+option py_generic_services = true;
+option java_generic_services = true;
+
+//querycreative
+message DNRequest {
+    // 请求的广告牌列表
+    repeated uint64 creative_ids = 1;
+
+    optional bytes session_id = 2;
+    
+    optional string trace_id = 3;
+
+}
+
+message DNResponse {
+    //rescodeing定义如下:
+    // 定向类型枚举，   0成功，1请求数据格式错，2查询内部错， 3无返回
+    required poseidon.common.ErrorCode error_code = 1;
+
+    // 处理的机器名称
+    optional bytes hostname = 2;
+
+    repeated poseidon.common.Creative creative = 3;
+
+    optional bytes session_id = 4;
+    
+    optional string trace_id = 5;
+}
+

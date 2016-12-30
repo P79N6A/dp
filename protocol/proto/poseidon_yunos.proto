@@ -1,0 +1,141 @@
+package com.yunos.exchange.service.provider.dto;
+option java_package = "com.yunos.exchange.service.provider.dto";
+
+option java_outer_classname = "Proto";
+
+message BidRequest {
+    // 当前协议版本
+    required int32 version = 1;
+    // 唯一竞价ID
+    required string bid = 2;
+    // 手机唯一标识
+    required string uuid = 3;
+    // 用户标签, 详细见字典
+    repeated string userTag = 4;
+    // 广告位所在的app
+    required string appName = 5;
+    // 手机分辨率
+    optional string screen = 6;
+    // 网络环境
+    optional string network = 7;
+    // 需要排除的app, 多个app采用逗号分隔
+    repeated string excluedPkgs = 8;
+
+    // 认证key
+    required string authKey = 9;
+    //签名
+    required string sign = 10;
+    // 时间戳, 毫秒
+    required int64 timestamp = 11;
+
+    // 广告位
+    repeated AD ads = 12;
+    message AD {
+        // 广告位ID
+        required string adId = 1;
+        // 分类, 与pkgs、keyword三选一，也可全不传
+        repeated string categories = 2;
+        // app 包名,与cateories、keyword三选一，也可全不传
+        repeated string pkgs = 3;
+        // 与cateories、pkgs三选一，也可全不传
+        optional string keyword = 4;
+        // 推广位类型
+        required string viewType = 5;
+        //推广位的展现位置的类型
+        required string posType = 6;
+        // 推广位个数
+        required int32 bidCount = 7;
+    }
+}
+
+message BidResponse {
+    // 当前协议版本
+    required int32 version = 1;
+    // 对应BidRequest 的bid
+    required string bid = 2;
+    //推广位列表
+    repeated AD ads = 3;
+
+    message AD {
+        // 广告位ID
+        required string adId = 1;
+        repeated App apps = 2;
+    }
+    message App {
+        // 价格, 单位分
+        required int32 price = 1;
+        // 包名
+        required string packageName = 2;
+        // 版本号
+        required int32 versionCode = 3;
+        // 下载地址
+        required string downloadUrl = 4;
+        //https下载地址
+        optional string httpsDownloadUrl = 5;
+        // apk的签名
+        required string signature = 6;
+        // apk的md5
+        required string md5 = 7;
+        // apk的大小, 单位 byte
+        required int32 size = 8;
+        //外部扩展字段
+        optional string external = 9;
+    }
+}
+
+message SyncRequest {
+    // 当前协议版本
+    required int32 version = 1;
+    // 唯一竞价ID
+    required string bid = 2;
+    // 手机唯一标识
+    required string uuid = 3;
+    // 广告位所在的app
+    required string appName = 4;
+    // 广告id
+    required string adId = 5;
+    // 用户行为
+    required string action = 6;
+    // app 包名
+    required string packageName = 7;
+    // apk 文件md5
+    optional string md5 = 8;
+    //操作同步到服务端的时间
+    required int64 time = 9;
+    //外部扩展字段
+    optional string external = 10;
+
+    // 时间戳,毫秒
+    required int64 timestamp = 11;
+    required string authKey = 12;
+    required string sign = 13;
+}
+
+message BidResultRequest {
+    // 当前协议版本
+    required int32 version = 1;
+    // 唯一竞价ID
+    required string bid = 2;
+    // 手机唯一标识
+    required string uuid = 3;
+    // 广告位所在的app
+    required string appName = 4;
+
+    required string authKey = 5;
+    // 时间戳,毫秒
+    required int64 timestamp = 6;
+    required string sign = 7;
+
+    repeated Ad ads = 8;
+
+    message Ad {
+        // 广告位ID
+        required string adId = 1;
+        repeated App apps = 2;
+    }
+
+    message App {
+        // 包名
+        required string packageName = 1;
+    }
+}

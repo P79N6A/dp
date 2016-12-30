@@ -1,0 +1,24 @@
+package trd;
+
+//create by xxxx
+//date: 2016/05
+
+option cc_generic_services = true;
+option py_generic_services = true;
+option java_generic_services = true;
+
+message TRDInfo {
+	required string imp_id = 1;
+	optional string dsp_id = 2;
+	required string bid = 3;
+	optional string session_id = 4;
+	optional int32 traffic_source = 5;
+	optional string ref_session_id = 6;
+	optional string creative_id = 7;
+	
+	optional uint64 pv_time = 8;
+	optional string adgroup_id = 9;
+	optional string campaign_id = 10;
+	
+
+};

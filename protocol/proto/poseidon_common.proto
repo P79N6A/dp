@@ -1,0 +1,354 @@
+import "poseidon_rtb.proto";
+
+package poseidon.common;
+
+enum ErrorCode{
+    // COMMON ERROR //
+    ERROR_NONE = 0;         //成功请求
+    ERROR_UNKNOWN = 1;
+    ERROR_INNER_ERROR = 2;  //内部错
+    ERROR_REQUEST = 3;      //请求格式错
+    ERROR_NO_RESULT = 4;      //没有结果
+    ERROR_BACKUP_AD = 5;      //兜底广告
+}
+
+// 流量地域信息
+message Geo {
+    // 流量来源ip
+    optional string ip = 1;
+
+    //纬度
+    optional float latitude = 2;
+
+    //经度
+    optional float longtitude = 3;
+
+    //city used
+    optional string city = 4;
+}
+
+//定向信息
+message Targetting{
+    //定向类型 modify bu zhangtt 修改定向信息type类型，id化后是个int
+    optional uint32 type = 1;
+
+    //定向值
+    repeated string value = 2;
+}
+
+message Creative {
+    //创意id
+    required uint64 creative_id = 1;
+
+    //广告牌的标题
+    optional string title = 2;
+
+    //广告牌模板形式
+    optional uint32 template_id = 3;
+
+    //内容
+    optional string content = 4;
+
+    //创意跳转地址
+    optional string dest_url = 5;
+
+    //创意点击地址
+    optional string click_url = 6;
+
+    //创意类目
+    repeated uint32 creative_category = 7;
+
+    //创意等级
+    optional uint32 creative_level = 8;
+
+    //创意类型 1.文字 2.图片 3.flash 4.video
+    optional uint32 creative_format = 9;
+
+    //创意品牌id
+    optional uint32 creative_brand_id = 10;
+
+    //创意宽
+    optional uint32 width = 11;
+
+    //创意高
+    optional uint32 height = 12;
+
+
+    //落地方式
+    optional uint32 landing_mode = 13;
+
+    //落地页目标窗口：1-新窗口打开，2-原窗口打开
+    optional uint32 landing_url_target = 14;
+
+    //标的物名称
+    optional string subject_name = 15;
+
+	//标的物描述
+    optional string subject_desc = 16;
+
+    //标的物分类
+    optional uint32 subject_category_id = 17;
+
+    //程序系统平台：1-Android，2-iOS
+    optional uint32 app_os_platform = 18;
+
+    //推广网址
+    optional string website_url = 19;
+
+    //推广网址
+    optional string website_name = 20;
+
+    //广告主id
+    optional uint32 a_id = 21;
+
+    //行业id
+    optional uint32 industry_id = 22;
+
+    //推广计划id
+    optional uint32 plan_id = 23;
+
+    //广告类型id
+    optional uint32 ad_type_id = 24;
+
+    //广告规格id
+    optional uint32 ad_format_id = 25;
+
+    //广告名称
+    optional string ad_name = 26;
+
+    //标的物id
+    optional uint32 subject_id = 27;
+
+    //下载方式：1-Android应用内直接下载，2-Android应用内询问后下载，3-ios跳往appstore下载，4-ios应用内webview打开appstore详情页
+    optional uint32 download_type = 28;
+
+    //打开方式：1-应用内webview打开，2-跳往浏览器打开
+    optional uint32 open_type = 29;
+
+    //唤醒url（当填写该字段，优先唤醒本地app，如无法唤醒，则打开窗口或下载）
+    optional string deeplink_url = 30;
+
+    //广告语
+    optional string ad_words = 31;
+
+    //广告图片url
+    optional string img_url = 32;
+
+    //创意状态
+    optional uint32 status = 33;
+
+    //视频URL
+    optional string video_url = 34;
+
+    //后缀
+    optional string suffix = 35;
+
+    //素材id
+    optional string material_id = 36;
+
+    //特定的数据，供特殊source-view_type使用
+    optional bytes specific_data = 37;
+
+    //外部创意ID
+    optional bytes ext_cid = 38;
+
+}
+
+//返回广告定义
+message Ad {
+    //计划组id
+    optional uint32 campaign_id = 1;
+
+    //独立访客展现量控制
+    optional int64 freq_impression = 2;
+
+    //每日预算, -1, 表示不限
+    optional int64 campaign_daily_budget = 3;
+
+    //投放策略
+    optional poseidon.rtb.SendSpeedType send_speed = 4;
+
+    optional string billing_type = 5;
+
+    //计划投递时段, counter拿到这个字段要做预算的计算和平滑
+    optional uint64 post_hours = 6;
+
+    //广告主id
+    optional uint32 advertiser_id = 7;
+
+    //广告主预算
+    optional uint32 advertiser_budget = 8;
+
+    //推广单元id
+    optional uint32 adgroup_id = 9;
+
+    //创意id, 经过了templateid, category, level, format等过滤之后的
+    optional uint64 creative_id = 10;
+
+    //广告主原始报价
+    optional uint32 org_price = 11;
+
+    //算法报价
+    optional uint32 algo_price = 12;
+
+    //索引离线海选分数
+    optional uint32 score = 13;
+
+    //创意类型 1. 图片 2 文字 3 flash 4 video等
+    optional uint32 creative_format = 14;
+
+    //广告主想要拿下流量的基础出价，算法报价在 org_price(最高报价)之下，在base_price左右浮动
+    optional uint32 base_price = 15;
+
+    //报价方式 1: 智能出价; 2: 固定报价;
+    optional uint32 bid_type = 16;
+
+    //付费方式
+    optional uint32 product= 17;
+
+     //渠道
+    optional string ch = 18;
+
+    //内部广告主id
+    optional uint32 inner_advertiser_id = 19;
+
+    //gid
+    optional uint32 gid = 20;
+
+    message PdbData
+    {
+        //订单ID
+        optional bytes deal_id = 1;
+
+        //媒体结算价格
+        optional uint32 settle_price = 2;
+
+        //订单总曝光量
+        optional int64 total_exp = 3;
+
+        //订单当天的总曝光量
+        optional int64 day_exp = 4;
+
+        //推广计划的订单配额(0~1000),
+        //day_exp*campaign_quota/1000就是推广计划一天的曝光量
+        optional int32 campaign_quota = 5;
+
+        //填充率(0~100)
+        optional int32 fill_rate = 6;
+    };
+    optional PdbData pdb_data=21;
+
+    //推广计划类型，1-程序化直投
+    optional int32 campaign_type=22;
+
+    //溢价率，百分数，example:20表示溢价20%
+    optional int32 premium_rate=23;
+
+    //广告主余额
+    optional int32 advertiser_balance=24;
+
+    //广告主余额的天,格式"YYYYMMDD", 如“20161109”
+
+    optional bytes advertiser_balance_day=25;
+
+    //广告投放的地域
+    repeated int32 post_region = 26;
+    //多view_type支持
+    optional int32 view_type = 27;
+}
+
+message FeedbackInfo
+{
+    //广告id
+    optional uint32 adgroup_id = 1;
+
+    //推广计划id
+    optional uint32 campaign_id = 2;
+
+    //广告主id
+    optional uint32 advertiser_id = 3;
+
+    //ali id
+    optional string aid = 4;
+
+    //ali cookie
+    optional string acookie = 5;
+
+    //设备ID
+    optional string dev_id = 6;
+
+    //广告主当日花费
+    optional int64 advertiser_day_cost = 7;
+
+    //推广计划当日话费
+    optional int64 campaign_day_cost = 8;
+
+    //广告当日扣费
+    optional int64 adgroup_day_cost = 9;
+
+    //广告主-用户 当天频次次数
+    optional int32 advertiser_user_day_freq = 10;
+
+    //广告计划-用户 当天频次次数
+    optional int32 campaign_user_day_freq = 11;
+
+    //广告-用户 当天频次次数
+    optional int32 adgroup_user_day_freq = 12;
+
+    message CreativeCost
+    {
+        //创意ID
+        optional int32 cid=1;
+
+        //创意当日话费
+        optional int64 creative_day_cost=2;
+
+        //创意当天频次次数
+        optional int32 creative_day_freq=3;
+        
+        //用户-创意当天点击频次
+        optional int32 creative_click_day_freq = 4;
+    };
+    //创意级别扣费情况
+    repeated CreativeCost creative_cost= 13;
+
+    //PDB 的反馈信息
+    message PdbFeedback
+    {
+        //订单ID
+        optional bytes deal_id = 1;                 //订单ID
+        optional int64 deal_day_exp = 2;            //订单单天曝光量
+        optional int64 deal_campaign_day_exp = 3;   //该订单的该推广计划普光情况
+
+    };
+    optional PdbFeedback pdb_feedback=14;
+
+    optional int64 advertiser_last_day_cost=15;     //广告主昨天消费金额
+
+    optional int32 user_view_type_freq=16;          //用户-view_type曝光频次
+
+    message UserClickInfo
+    {
+        optional int32 adgroup_user_day_freq = 1;   //用户-广告
+        optional int32 campaign_day_freq = 2;       //用户-推广计划
+        optional int32 advertiser_day_freq = 3;     //用户-广告主
+        optional int32 view_type_day_freq = 4;      //用户-viewtype
+    };
+    optional UserClickInfo user_click_info = 17;      //用户点击信息
+}
+
+message ExpParam
+{
+    optional int32 param_id = 1;    //参数ID
+    optional int32 int_value = 2;   //INT VALUE，如果该参数是INT类型的话，被置上
+    optional float float_value = 3; //FLOAT VALUE, 如果该参数是INT类型的话，被置上
+    optional int32 view_type = 4;
+}
+
+message ScoringToOrsMsg {
+    repeated int32 user_seed = 1;
+    optional int32 user_grade = 2;
+    optional float context_quality = 3;
+}
+
+

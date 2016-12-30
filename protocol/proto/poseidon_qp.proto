@@ -1,0 +1,83 @@
+import "poseidon_common.proto";
+import "poseidon_rtb.proto";
+import "poseidon_dmp.proto";
+
+option cc_generic_services = true;
+option py_generic_services = true;
+
+package poseidon.qp;
+
+//======================================================================
+// QPRequest related
+//======================================================================
+message QPRequest {
+    // dsp id
+    optional string dsp_id = 1;
+        
+    // session id for merging log.
+    optional bytes session_id = 2;
+
+
+    //展现位信息
+    repeated poseidon.rtb.Impression impressions = 3;
+
+    //站点信息
+    optional poseidon.rtb.Site site = 4;
+
+    //用户信息
+    optional poseidon.rtb.User user = 5;
+
+    //设备信息
+    optional poseidon.rtb.Device device = 6;
+    
+    //站点信息
+    optional poseidon.rtb.App app = 7;
+    
+    optional string trace_id = 8;
+}
+
+//=============================================================================
+// QPResponse related
+//=============================================================================
+
+message ImpressionTarget {
+    //impression id标识
+    required string id = 1;
+
+    //广告位定向信息    
+    repeated poseidon.common.Targetting targets = 2;    
+}
+
+message DmpInfo {
+    //TO sn 
+    repeated poseidon.common.Targetting user_targets = 1;
+
+    // dmp定向的gid del by zhangtt 20160513
+   //repeated string dmp_gids = 2;
+
+    //TO SN and ors
+    repeated poseidon.common.Targetting ors_targets = 2;
+}
+
+message QPResponse {
+    //返回结果状态码
+    required poseidon.common.ErrorCode error_code = 1;
+
+    //处理机器名称
+    optional string hostname = 2;
+
+    // session id for merging log.
+    optional bytes session_id = 3;
+
+    // 广告位定向信息
+    repeated ImpressionTarget impressions = 4;
+
+    // 如果有dmp定向，返回dmp定向信息
+    optional DmpInfo dmp_info = 5;
+    
+    optional string trace_id = 6;
+    
+    optional string imei = 7;
+
+}
+

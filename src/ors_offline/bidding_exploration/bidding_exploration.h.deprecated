@@ -1,0 +1,44 @@
+#ifndef _BIDDING_EXPLORATION_H_
+#define _BIDDING_EXPLORATION_H_
+
+#include <vector>
+#include <string>
+#include <set>
+#include "third_party/hiredis/include/hiredis.h"
+
+namespace poseidon
+{
+	namespace ors_offline
+	{
+		class BiddingExploration
+		{
+		struct RedisServer
+		{
+			std::string ip;
+			int port;
+		};
+
+		private:
+			RedisServer m_redis_server;
+			int m_min_imps;
+		public:
+			BiddingExploration();
+			virtual ~BiddingExploration();
+
+			// init redis server.
+			int init(std::string redis_server_ip, int redis_server_port);
+			int getAllInventoryIds(std::map<std::string, 
+					std::set<std::string> >& inventory_keys);
+			int getBidPriceCnt(const std::string& inventory_id, 
+					const std::set<std::string>& inventory_id_keys, 
+					std::map<int, int>& price_cnt);
+			int getBidLandscape(const std::string& inventory_id, 
+					const std::set<std::string>& inventory_id_keys,
+					std::map<float, int>& bid_landscape, 
+					std::map<float, float>& bid_cost,
+					std::map<int, int>& price_cnt);
+		};
+	} // ors_offline
+} // namespace poseidon
+
+#endif // _BIDDING_EXPLORATION_H_

@@ -1,0 +1,32 @@
+NEED_COMM_EVENT=1
+NEED_BOOST=1
+NEED_LOG=1
+NEED_PROTO=1
+NEED_JSONCPP=1
+NEED_HA=1
+NEED_ZK4CPP=1
+NEED_SSL=1
+NEED_HIREDIS=1
+NEED_MONITOR_NEW=1
+FILES=$(wildcard *.cpp)
+OBJS=$(patsubst %.cpp, %.o, $(FILES))
+TARG=poseidon_qp
+
+all:$(TARG)
+
+$(OBJS):%.o:%.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+$(TARG):$(OBJS)
+	$(CXX) -o $@ $^ $(LDFLAGS)
+	rm -f $(ROOT_DIR)/envs/poseidon/bin/$(TARG)
+	cp -r $(TARG) $(ROOT_DIR)/envs/poseidon/bin/
+	md5sum $(TARG)
+
+clean:
+	rm  -f $(OBJS) $(TARG)
+
+install:
+	cp -r $(TARG) $(ROOT_DIR)/envs/poseidon/bin/
+include ../../Makefile.inc
+

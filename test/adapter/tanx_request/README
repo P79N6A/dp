@@ -1,0 +1,75 @@
+模拟Tanx竞价请求的一个python脚本
+脚本将尝试发送随机产生BidRequest,使用HTTP POST方式实时竞买人在指定的URL,这些生成的请求类似于真正发送的请求.
+脚本将尝试解析您的答复并将 显示一个摘要，其中包括发送的请求数，成功的请求，并将发送竞价成功确认信息发送到
+   FEED_URL
+
+一、安装步骤
+1)安装google的protobuf
+  你可以取得protobuf源码
+  http://code.google.com/p/protobuf/
+
+2)部署google的protobuf环境
+  tar -zxvf protobuf-2.3.0.tar.gz(版本高于2.3.0)
+  cd protobuf-2.3.0;
+  ./configure; make; 
+  sudo make install;
+
+3)部署protobuf的python运行环境
+  cd protobuf-2.3.0/python;
+  sudo python setup.py install
+
+4)解压, 开始使用request工具
+  工具中有一个tanx-bidding.proto, 
+  执行make;
+  如果Tanx有通知升级该协议文件,直接更新,再执行make;
+
+5)协议升级
+  当我们的协议升级之后,请到如下地址取得我们的最新的协议文件(tanx-bidding.proto),
+  http://code.taobao.org/p/adx_guide/wiki/index/
+
+二、使用方法
+测试一个单一的请求,命令如下:
+  python requester.py  --url=<url> --encoded_price=<encoded_price> --max_qps=1 --requests=1 --mobile 0.2
+  注意：如果设置encoded_price(编码后的价格)，则工具会将该字符串值替换掉html_snippet字段里的%%SETTLE_PRICE%%宏，
+        方便dsp测试。在提交审核代码给tanx时，encoded_price参数需要置空
+  视频广告(前贴/暂停)类型的命令如下：
+  python requester.py --url=http://10.125.205.20:90/jimmy_mock.py --max_qps=1 --encoded_price=100 --requests=5 --video=1 --video_type=1 --video_source_file=http://xxxx.xxxx.com/xxxx.flv
+  
+l)可以测试您的DSP连续请求使用 --seconds 或 --requests 请求选项。使用--max_qps选项控制
+  在每秒查询的负载, For example:
+  python requester.py  --url=<url> --max_qps=5 --requests=100
+  python requester.py  --url=<url> --max_qps=1 --seconds=20
+  最好不要使用该工具作为一个负载测试工具
+
+2)使用mobile参数可以产生具有mobile消息的竞价请求。为了方便测试，我们使用了sdk.head.html模拟sdk的行为。你可以看到相应的展现和点击
+
+3)如果测试视频类型(暂停/贴片)广告，请使用以下3个参数，video参数表示视频广告pv请求比率，默认为0；video_type参数表示视频广告的类型，其中0表示非线性广告，
+  1表示线性广告，默认为0；video_source_file表示DSP自己的广告创意存储的URL地址，如果不填写，默认值是Tanx的抄底前贴片广告创意，此外，前贴广告预览请填写flv格式的文件url。
+
+4)对于新的点击宏(%%CLICK_URL_PRE_UNENC%%, %%CLICK_URL_PRE_ENC%%)，工具中会替换为'http://localhost/click.php?tanx_e=&tanx_k=&tanx_u='，
+  为了能点击跳转，你需要搭建个简易的server(localhost)来处理点击跳转，以php(click.php)为例：<?php header("Location:".($_GET["tanx_u"]));?>
+  在提交审核代码时，请保持点击跳转的地址为http://localhost/click.php。
+
+5)你可以提供一个文件,里边为Tanx的user_ids, 方便您测试您的cookie-mapping
+  我们会随机选取其中一行为Tanx的user_id
+  For example:
+  python requester.py  --url=<url> --max_qps=1 --requests=1 --tanx_user_ids_file=<file_path> --encoded_price=<encoded_price>
+
+6)工具会输出一些文件, 记录竞价信息 
+ * good-<timestamp>.log
+    记录所有竞价成功的requests 和 responses
+ * error-<timestamp>.log
+    记录所有的HTTP 返回码不为200 的bid requests, HTTP response codes, and HTTP response
+ * invalid-<timestamp>.log
+    记录所有的responses格式错误的 的bid requests, HTTP response codes, and HTTP response
+ * problematic-<timestamp>.log
+    记录所有的responses内容错误的 的bid requests, HTTP response codes, and HTTP response
+ * snippets-<timestamp>.html
+    包含所有BidRequests，BidResponses和呈现的HTML片段有效片段的有效反应的请求
+	你可以将这个文件使用浏览器打开查看广告展现
+ * vast_ad-<timestamp>.html
+    这个文件专门用来保存视频类型广告结果，包含所有BidRequests，BidResponses和呈现的HTML片段有效片段的有效反应的请求
+	你可以将这个文件使用浏览器打开查看广告展现，请注意这个html文件需要配合工具中自带的nonlinear_loader.swf和linear_loader.swf
+	两个视频广告渲染工具才能够正常展现广告。
+
+

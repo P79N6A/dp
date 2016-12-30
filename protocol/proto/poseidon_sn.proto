@@ -1,0 +1,159 @@
+import "poseidon_common.proto";
+import "poseidon_rtb.proto";
+import "poseidon_util.proto";
+
+option cc_generic_services = true;
+option py_generic_services = true;
+option java_generic_services = true;
+
+package poseidon.sn;
+
+//======================================================================
+// SNRequest related
+//======================================================================
+
+// 页面广告位信息
+message AdzInfo {
+    //广告位id
+    optional string id = 1;
+
+    // 广告位尺寸, 例如200x300中的200
+    optional int32 width = 2;
+
+    // 广告位尺寸, 例如200x300中的300
+    optional int32 height = 3;
+
+    //广告位需要返回的广告数
+    optional uint32 ad_num = 4 [default = 1];
+    
+    //广告位允许的模板id
+    repeated uint32 template_id = 5;
+
+    //广告位允许的创意等级
+    optional uint32 creative_level = 6;
+
+    //广告位允许的创意格式
+    repeated int32 creative_format = 7;
+
+    //广告位屏蔽的创意格式
+    repeated int32 blocked_creative_format = 8;
+
+    //广告位允许的创意类目
+    repeated uint32 creative_category = 9;
+
+    //广告位屏蔽的创意类目
+    repeated uint32 blocked_creative_category = 10;
+
+    //广告位允许的创意品牌id
+    repeated uint32 creative_brandid = 11;    
+
+    //广告位屏蔽的创意品牌id
+    repeated uint32 blocked_creative_brandid = 12;    
+
+    //广告位允许的广告主id白名单，应用于私有交易
+    repeated uint32 advertiser_id = 13;
+
+    //定向维度信息, 一个广告位一个定向
+    repeated poseidon.common.Targetting targetting = 14;
+
+    //广告位 展现类型，tanx系统专有
+    optional int32 view_type = 15;
+
+    //订单ID, pdb交易需要
+    optional bytes deal_id = 16;
+    
+    //多view_type支持
+    repeated int32 view_types = 17;
+
+    //视频信息
+    optional poseidon.rtb.Video video = 18;
+
+    //最低竞价min_cpm_price
+    optional uint32 min_cpm_price = 19 [default = 0];
+}
+
+// 流量时间信息 
+message TimeInfo {
+    // 当前日期在一年中的下标，取值范围[1-366]
+    optional uint32 date_index = 1;
+
+    // 当前时间距离1970年1月1日的秒数（时间戳）
+    optional uint32 timestamp = 2;
+
+    // 当前的小时, 0-23
+    optional uint32 hour = 3;
+    
+    // 星期，取值区间为[0,6]，其中0代表星期天，1代表星期一
+    optional uint32 weekday = 4;    
+}
+
+// merger请求sn的接口
+message SNRequest{
+    // 页面广告位信息
+    repeated AdzInfo adz_info = 1;
+
+    // 流量上下文信息
+    optional TimeInfo time_info = 2;
+
+    // 地域信息
+    optional poseidon.common.Geo geo = 3;
+
+    // session id for merging log.
+    optional bytes session_id = 4;
+
+    // dsp id
+    optional string dsp_id = 5;
+
+    // 流量来源
+    optional int32 traffic_source = 6;
+    
+    optional string trace_id = 7;
+
+    //流量来源app信息
+    optional poseidon.rtb.App app_info = 8;
+
+    //设备信息
+    optional poseidon.rtb.Device device_info = 9;
+
+}
+
+//=============================================================================
+//SNResponse related
+//=============================================================================
+
+message Ads {
+    //广告位error code信息
+    required poseidon.common.ErrorCode err_code = 1;
+    
+    //该广告对应请求广告位的id
+    optional string adzone_id = 2;
+
+    //广告相关 
+    repeated poseidon.common.Ad ad = 3;
+}
+
+message SNResponse{
+    //返回结果状态码
+    required poseidon.common.ErrorCode err_code = 1;
+
+    //处理机器名称
+    optional string hostname = 2;
+
+    //广告相关
+    repeated Ads ads = 3;
+
+    // session id for merging log.
+    // 从SNRequest中拷贝过来
+    optional bytes session_id = 4;
+    
+    optional string trace_id = 5;
+
+    // 落地pv日志 user_seed/user_grade/context_quality
+    repeated poseidon.util.KeyValue scoring_pvlogs = 6;
+    //传递给ors的信息
+    optional poseidon.common.ScoringToOrsMsg scoring_to_ors_msg = 7;
+    //实验ID
+    repeated int32 exp_id = 8;
+
+}
+
